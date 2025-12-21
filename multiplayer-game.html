@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>غرفة اللعب الجماعي - لعبة وريث</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Multiplayer Game CSS -->
+    <style>
+        .multiplayer-game-container {
+            min-height: 100vh;
+            padding: 1rem 0;
+        }
+        
+        .game-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr 300px;
+            gap: 1rem;
+            height: calc(100vh - 120px);
+        }
+        
+        @media (max-width: 1200px) {
+            .game-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr auto;
+            }
+        }
+        
+        /* Players Panel */
+        .players-panel {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+            border: 2px solid var(--secondary-color);
+        }
+        
+        .player-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            transition: background-color 0.3s ease;
+        }
+        
+        .player-item:hover {
+            background-color: var(--light-color);
+        }
+        
+        .player-item.current-user {
+            background: linear-gradient(135deg, rgba(184, 116, 59, 0.1), rgba(141, 95, 59, 0.1));
+            border: 1px solid var(--primary-color);
+        }
+        
+        .player-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+        
+        .player-info {
+            flex-grow: 1;
+        }
+        
+        .player-name {
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 0.25rem;
+        }
+        
+        .player-status {
+            font-size: 0.75rem;
+            color: #666;
+        }
+        
+        .player-score {
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .player-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        
+        .indicator-ready {
+            background: var(--success-color);
+        }
+        
+        .indicator-thinking {
+            background: var(--warning-color);
+            animation: pulse 1s infinite;
+        }
+        
+        .indicator-waiting {
+            background: #ccc;
+        }
+        
+        /* Game Area */
+        .game-area {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+            border: 2px solid var(--secondary-color);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .game-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .room-info {
+            background: linear-gradient(135deg, rgba(184, 116, 59, 0.1), rgba(141, 95, 59, 0.1));
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .game-timer {
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        
+        .question-display {
+            background: var(--light-color);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .question-text {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            text-align: center;
+            line-height: 1.8;
+        }
+        
+        .answers-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .answer-option {
+            background: white;
+            border: 2px solid var(--secondary-color);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .answer-option:hover:not(.disabled) {
+            background: var(--light-color);
+            transform: translateY(-3px);
+            box-shadow: 0 0.5rem 1rem rgba(184, 116, 59, 0.2);
+        }
+        
+        .answer-option.selected {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .answer-option.correct {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border-color: #28a745;
+            animation: correctPulse 0.5s ease;
+        }
+        
+        .answer-option.incorrect {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            border-color: #dc3545;
+            animation: shake 0.5s ease;
+        }
+        
+        .answer-option.disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .answer-letter {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            line-height: 40px;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .answer-option.selected .answer-letter {
+            background: white;
+            color: var(--primary-color);
+        }
+        
+        /* Chat Panel */
+        .chat-panel {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+            border: 2px solid var(--secondary-color);
+            display: flex;
+            flex-direction: column;
+            max-height: 100%;
+        }
+        
+        .chat-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1rem;
+            border-radius: 1rem 1rem 0 0;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chat-messages {
+            flex-grow: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            max-height: 400px;
+        }
+        
+        .chat-input {
+            padding: 1rem;
+            border-top: 1px solid var(--secondary-color);
+        }
+        
+        .message {
+            margin-bottom: 0.75rem;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+        }
+        
+        .message.system {
+            background: var(--light-color);
+            text-align: center;
+            font-style: italic;
+            color: #666;
+            font-size: 0.875rem;
+        }
+        
+        .message.other {
+            background: var(--light-color);
+            text-align: right;
+        }
+        
+        .message.self {
+            background: linear-gradient(135deg, rgba(184, 116, 59, 0.1), rgba(141, 95, 59, 0.1));
+            text-align: left;
+        }
+        
+        .message-author {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .message-text {
+            color: var(--dark-color);
+            font-size: 0.875rem;
+        }
+        
+        .message-time {
+            color: #666;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
+        
+        /* Game Controls */
+        .game-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: auto;
+        }
+        
+        .ready-btn {
+            background: linear-gradient(135deg, var(--success-color), #20c997);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .ready-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(40, 167, 69, 0.3);
+        }
+        
+        .ready-btn.ready {
+            background: linear-gradient(135deg, var(--warning-color), #ffc107);
+        }
+        
+        .leave-btn {
+            background: linear-gradient(135deg, var(--danger-color), #c82333);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .leave-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(220, 53, 69, 0.3);
+        }
+        
+        /* Spectator Mode */
+        .spectator-banner {
+            background: linear-gradient(135deg, var(--warning-color), #ffc107);
+            color: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        
+        /* Progress Bar */
+        .progress-bar-custom {
+            height: 8px;
+            background: rgba(184, 116, 59, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745, #ffc107, #dc3545);
+            transition: width 1s linear;
+        }
+        
+        /* Animations */
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .answers-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .game-timer {
+                font-size: 2rem;
+            }
+            
+            .question-text {
+                font-size: 1.25rem;
+            }
+            
+            .game-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .players-panel,
+            .chat-panel {
+                max-height: 300px;
+            }
+        }
+    </style>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body class="bg-heritage">
+    <!-- Background Pattern -->
+    <div class="bg-pattern"></div>
+    
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="multiplayer.html">
+                <i class="fas fa-crown text-warning me-2"></i>
+                <span class="fw-bold">وريث</span>
+            </a>
+            
+            <div class="d-flex align-items-center gap-3">
+                <span class="badge bg-success">
+                    <i class="fas fa-circle me-1"></i>
+                    <span id="roomStatus">في انتظار</span>
+                </span>
+                <button class="btn btn-outline-light btn-sm" onclick="toggleFullscreen()">
+                    <i class="fas fa-expand"></i>
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="leaveRoom()">
+                    <i class="fas fa-sign-out-alt me-1"></i>
+                    مغادرة
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Multiplayer Game Container -->
+    <div class="multiplayer-game-container">
+        <div class="container-fluid">
+            <!-- Spectator Banner -->
+            <div class="spectator-banner" id="spectatorBanner" style="display: none;">
+                <i class="fas fa-eye me-2"></i>
+                أنت تشاهد هذه الغرفة - لا يمكنك المشاركة في الإجابات
+            </div>
+            
+            <!-- Game Layout -->
+            <div class="game-layout">
+                <!-- Players Panel -->
+                <div class="players-panel">
+                    <h5 class="mb-3">
+                        <i class="fas fa-users me-2"></i>
+                        اللاعبون
+                    </h5>
+                    <div id="playersList">
+                        <div class="player-item current-user">
+                            <div class="player-avatar">أحمد</div>
+                            <div class="player-info">
+                                <div class="player-name">أحمد (أنت)</div>
+                                <div class="player-status">جاهز</div>
+                            </div>
+                            <div class="player-score">0</div>
+                            <div class="player-indicator indicator-ready"></div>
+                        </div>
+                        <div class="player-item">
+                            <div class="player-avatar">سارة</div>
+                            <div class="player-info">
+                                <div class="player-name">سارة</div>
+                                <div class="player-status">جاهز</div>
+                            </div>
+                            <div class="player-score">0</div>
+                            <div class="player-indicator indicator-ready"></div>
+                        </div>
+                        <div class="player-item">
+                            <div class="player-avatar">خالد</div>
+                            <div class="player-info">
+                                <div class="player-name">خالد</div>
+                                <div class="player-status">جاهز</div>
+                            </div>
+                            <div class="player-score">0</div>
+                            <div class="player-indicator indicator-ready"></div>
+                        </div>
+                        <div class="player-item">
+                            <div class="player-avatar">فاطمة</div>
+                            <div class="player-info">
+                                <div class="player-name">فاطمة</div>
+                                <div class="player-status">في انتظار</div>
+                            </div>
+                            <div class="player-score">0</div>
+                            <div class="player-indicator indicator-waiting"></div>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-3">
+                    
+                    <div class="room-stats">
+                        <h6 class="mb-3">
+                            <i class="fas fa-chart-bar me-2"></i>
+                            إحصائيات الغرفة
+                        </h6>
+                        <div class="small mb-2">
+                            <i class="fas fa-users me-1"></i>
+                            <span id="playersCount">3/4</span> لاعبين جاهزين
+                        </div>
+                        <div class="small mb-2">
+                            <i class="fas fa-clock me-1"></i>
+                            وقت البدء: <span id="startTime">60</span> ثانية
+                        </div>
+                        <div class="small mb-2">
+                            <i class="fas fa-gamepad me-1"></i>
+                            المستوى: <span id="gameLevel">متوسط</span>
+                        </div>
+                        <div class="small">
+                            <i class="fas fa-tag me-1"></i>
+                            الفئة: <span id="gameCategory">تاريخ</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Game Area -->
+                <div class="game-area">
+                    <div class="game-header">
+                        <h3 class="mb-3">غرفة التراث الإسلامي</h3>
+                        <div class="room-info">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <i class="fas fa-users me-2"></i>
+                                    <span id="currentPlayers">3</span>/4
+                                </div>
+                                <div class="col-md-3">
+                                    <i class="fas fa-tag me-2"></i>
+                                    تاريخ
+                                </div>
+                                <div class="col-md-3">
+                                    <i class="fas fa-signal me-2"></i>
+                                    متوسط
+                                </div>
+                                <div class="col-md-3">
+                                    <i class="fas fa-clock me-2"></i>
+                                    15 سؤال
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Game Timer -->
+                    <div class="game-timer" id="gameTimer">15</div>
+                    <div class="progress-bar-custom">
+                        <div class="progress-fill" id="progressBar" style="width: 100%"></div>
+                    </div>
+                    
+                    <!-- Question Display -->
+                    <div class="question-display" id="questionDisplay">
+                        <div class="question-text" id="questionText">
+                            في انتظار بدء اللعبة...
+                        </div>
+                    </div>
+                    
+                    <!-- Answers Grid -->
+                    <div class="answers-grid" id="answersGrid" style="display: none;">
+                        <div class="answer-option" onclick="selectAnswer(this, 'A')">
+                            <div class="answer-letter">أ</div>
+                            <div class="answer-text">الإجابة الأولى</div>
+                        </div>
+                        <div class="answer-option" onclick="selectAnswer(this, 'B')">
+                            <div class="answer-letter">ب</div>
+                            <div class="answer-text">الإجابة الثانية</div>
+                        </div>
+                        <div class="answer-option" onclick="selectAnswer(this, 'C')">
+                            <div class="answer-letter">ج</div>
+                            <div class="answer-text">الإجابة الثالثة</div>
+                        </div>
+                        <div class="answer-option" onclick="selectAnswer(this, 'D')">
+                            <div class="answer-letter">د</div>
+                            <div class="answer-text">الإجابة الرابعة</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Game Controls -->
+                    <div class="game-controls">
+                        <button class="ready-btn" id="readyBtn" onclick="toggleReady()">
+                            <i class="fas fa-check me-2"></i>
+                            أنا جاهز
+                        </button>
+                        <button class="leave-btn" onclick="leaveRoom()">
+                            <i class="fas fa-sign-out-alt me-2"></i>
+                            مغادرة الغرفة
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Chat Panel -->
+                <div class="chat-panel">
+                    <div class="chat-header">
+                        <span>
+                            <i class="fas fa-comments me-2"></i>
+                            الدردشة
+                        </span>
+                        <span class="badge bg-light text-dark">
+                            <span id="chatOnlineCount">3</span>
+                        </span>
+                    </div>
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="message system">
+                            انضم أحمد إلى الغرفة
+                        </div>
+                        <div class="message other">
+                            <div class="message-author">سارة</div>
+                            <div class="message-text">مرحباً! هل الجميع جاهز؟</div>
+                            <div class="message-time">2:30</div>
+                        </div>
+                        <div class="message self">
+                            <div class="message-author">أحمد</div>
+                            <div class="message-text">أنا جاهز! لنبدأ</div>
+                            <div class="message-time">2:31</div>
+                        </div>
+                        <div class="message other">
+                            <div class="message-author">خالد</div>
+                            <div class="message-text">ممتاز! انتظر البقية</div>
+                            <div class="message-time">2:32</div>
+                        </div>
+                    </div>
+                    <div class="chat-input">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="chatInput" placeholder="اكتب رسالتك..." onkeypress="handleChatKeypress(event)">
+                            <button class="btn btn-primary" onclick="sendMessage()">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Multiplayer Game JavaScript -->
+    <script src="js/multiplayer-game.js"></script>
+</body>
+</html>

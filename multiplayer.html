@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اللعب الجماعي - لعبة وريث</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Multiplayer CSS -->
+    <style>
+        .multiplayer-container {
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+        
+        .room-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 245, 242, 0.95));
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+            border: 2px solid var(--secondary-color);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .room-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 1rem 2rem rgba(184, 116, 59, 0.2);
+        }
+        
+        .room-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .room-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .room-status {
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        
+        .status-waiting {
+            background: rgba(255, 193, 7, 0.2);
+            color: var(--warning-color);
+        }
+        
+        .status-playing {
+            background: rgba(40, 167, 69, 0.2);
+            color: var(--success-color);
+        }
+        
+        .status-full {
+            background: rgba(220, 53, 69, 0.2);
+            color: var(--danger-color);
+        }
+        
+        .room-info {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--secondary-color);
+            font-weight: 500;
+        }
+        
+        .room-players {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .player-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .empty-slot {
+            width: 40px;
+            height: 40px;
+            border: 2px dashed var(--secondary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--secondary-color);
+            font-size: 0.875rem;
+        }
+        
+        .create-room-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 1rem;
+            padding: 2rem;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid var(--primary-color);
+        }
+        
+        .create-room-btn:hover {
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            transform: translateY(-5px);
+            box-shadow: 0 1rem 2rem rgba(184, 116, 59, 0.2);
+        }
+        
+        .create-room-btn i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        
+        .chat-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 350px;
+            height: 450px;
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.2);
+            border: 2px solid var(--secondary-color);
+            display: none;
+            flex-direction: column;
+            z-index: 1000;
+        }
+        
+        .chat-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1rem;
+            border-radius: 1rem 1rem 0 0;
+            font-weight: 600;
+        }
+        
+        .chat-messages {
+            flex-grow: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            max-height: 300px;
+        }
+        
+        .chat-input {
+            padding: 1rem;
+            border-top: 1px solid var(--secondary-color);
+        }
+        
+        .chat-input input {
+            border: 1px solid var(--secondary-color);
+            border-radius: 2rem;
+            padding: 0.5rem 1rem;
+            width: 100%;
+        }
+        
+        .message {
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+        }
+        
+        .message.other {
+            background: var(--light-color);
+            text-align: right;
+        }
+        
+        .message.self {
+            background: linear-gradient(135deg, rgba(184, 116, 59, 0.1), rgba(141, 95, 59, 0.1));
+            text-align: left;
+        }
+        
+        .message-author {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .message-text {
+            color: var(--dark-color);
+            font-size: 0.875rem;
+        }
+        
+        .message-time {
+            color: #666;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
+        
+        .floating-chat-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+        
+        .floating-chat-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 1rem 2rem rgba(184, 116, 59, 0.3);
+        }
+        
+        .online-indicator {
+            width: 8px;
+            height: 8px;
+            background: var(--success-color);
+            border-radius: 50%;
+            margin-left: 0.5rem;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        @media (max-width: 768px) {
+            .chat-container {
+                width: 90%;
+                right: 5%;
+                left: 5%;
+            }
+            
+            .room-info {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body class="bg-heritage">
+    <!-- Background Pattern -->
+    <div class="bg-pattern"></div>
+    
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="dashboard.html">
+                <i class="fas fa-crown text-warning me-2"></i>
+                <span class="fw-bold">وريث</span>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard.html">
+                            <i class="fas fa-home me-1"></i>الرئيسية
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="game.html">
+                            <i class="fas fa-gamepad me-1"></i>فردي
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="multiplayer.html">
+                            <i class="fas fa-users me-1"></i>جماعي
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="leaderboard.html">
+                            <i class="fas fa-trophy me-1"></i>المتصدرين
+                        </a>
+                    </li>
+                </ul>
+                
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="profile.html">
+                            <i class="fas fa-user me-1"></i>الملف الشخصي
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">
+                            <i class="fas fa-sign-out-alt me-1"></i>
+                            تسجيل الخروج
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Multiplayer Container -->
+    <div class="multiplayer-container position-relative">
+        <div class="container">
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <h1 class="display-4 fw-bold text-white mb-3">
+                    <i class="fas fa-users me-3"></i>
+                    اللعب الجماعي
+                </h1>
+                <p class="lead text-primary">
+                    انضم إلى غرف اللعب وتحدى أصدقاءك في منافسات مثيرة
+                </p>
+                <div class="d-flex justify-content-center align-items-center gap-2 mt-3">
+                    <span class="badge bg-success px-3 py-2">
+                        <i class="fas fa-circle me-1"></i>
+                        <span id="onlineCount">24</span> لاعب متصل
+                    </span>
+                    <span class="badge bg-primary px-3 py-2">
+                        <i class="fas fa-door-open me-1"></i>
+                        <span id="activeRooms">6</span> غرف نشطة
+                    </span>
+                </div>
+            </div>
+            
+            <!-- Filter Tabs -->
+            <div class="filter-tabs bg-white rounded-3 p-3 mb-4 shadow">
+                <ul class="nav nav-pills justify-content-center" role="tablist">
+                    <li class="nav-item">
+                        <button class="nav-link active" data-bs-toggle="pill" type="button">
+                            <i class="fas fa-globe me-2"></i>جميع الغرف
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="pill" type="button">
+                            <i class="fas fa-clock me-2"></i>متاحة الآن
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="pill" type="button">
+                            <i class="fas fa-star me-2"></i>غرف خاصة
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- Rooms Grid -->
+            <div class="row">
+                <!-- Create Room Button -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="create-room-btn" onclick="showCreateRoomModal()">
+                        <i class="fas fa-plus-circle"></i>
+                        إنشاء غرفة جديدة
+                        <div class="small mt-2">ادعُ أصدقاءك للعب معاً</div>
+                    </div>
+                </div>
+                
+                <!-- Room 1 -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="room-card" onclick="joinRoom(1)">
+                        <div class="room-header">
+                            <div class="room-title">غرفة التراث الإسلامي</div>
+                            <div class="room-status status-waiting">في انتظار</div>
+                        </div>
+                        <div class="room-info">
+                            <div class="info-item">
+                                <i class="fas fa-tag"></i>
+                                <span>تاريخ</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-signal"></i>
+                                <span>متوسط</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-users"></i>
+                                <span>2/4</span>
+                            </div>
+                        </div>
+                        <div class="room-players">
+                            <div class="player-avatar">أحمد</div>
+                            <div class="player-avatar">سارة</div>
+                            <div class="empty-slot">+</div>
+                            <div class="empty-slot">+</div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="fas fa-clock me-1"></i>
+                                أنشئت قبل 5 دقائق
+                            </small>
+                            <button class="btn btn-primary btn-sm">
+                                <i class="fas fa-sign-in-alt me-1"></i>
+                                انضمام
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Room 2 -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="room-card" onclick="joinRoom(2)">
+                        <div class="room-header">
+                            <div class="room-title">تحدي الجغرافيا</div>
+                            <div class="room-status status-playing">قيد اللعب</div>
+                        </div>
+                        <div class="room-info">
+                            <div class="info-item">
+                                <i class="fas fa-tag"></i>
+                                <span>جغرافيا</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-signal"></i>
+                                <span>صعب</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-users"></i>
+                                <span>4/4</span>
+                            </div>
+                        </div>
+                        <div class="room-players">
+                            <div class="player-avatar">محمد</div>
+                            <div class="player-avatar">فهد</div>
+                            <div class="player-avatar">نورة</div>
+                            <div class="player-avatar">عبدالله</div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="fas fa-clock me-1"></i>
+                                بدأت قبل 2 دقيقة
+                            </small>
+                            <button class="btn btn-secondary btn-sm" disabled>
+                                <i class="fas fa-eye me-1"></i>
+                                مشاهدة
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Room 3 -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="room-card" onclick="joinRoom(3)">
+                        <div class="room-header">
+                            <div class="room-title">غرفة الثقافة السعودية</div>
+                            <div class="room-status status-waiting">في انتظار</div>
+                        </div>
+                        <div class="room-info">
+                            <div class="info-item">
+                                <i class="fas fa-tag"></i>
+                                <span>ثقافة</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-signal"></i>
+                                <span>سهل</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-users"></i>
+                                <span>1/4</span>
+                            </div>
+                        </div>
+                        <div class="room-players">
+                            <div class="player-avatar">خالد</div>
+                            <div class="empty-slot">+</div>
+                            <div class="empty-slot">+</div>
+                            <div class="empty-slot">+</div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="fas fa-clock me-1"></i>
+                                أنشئت قبل 10 دقائق
+                            </small>
+                            <button class="btn btn-primary btn-sm">
+                                <i class="fas fa-sign-in-alt me-1"></i>
+                                انضمام
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Room 4 -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="room-card" onclick="joinRoom(4)">
+                        <div class="room-header">
+                            <div class="room-title">بطولة الأبطال</div>
+                            <div class="room-status status-waiting">في انتظار</div>
+                        </div>
+                        <div class="room-info">
+                            <div class="info-item">
+                                <i class="fas fa-tag"></i>
+                                <span>متنوع</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-signal"></i>
+                                <span>محترف</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-users"></i>
+                                <span>3/6</span>
+                            </div>
+                        </div>
+                        <div class="room-players">
+                            <div class="player-avatar">سلطان</div>
+                            <div class="player-avatar">لينا</div>
+                            <div class="player-avatar">عمر</div>
+                            <div class="empty-slot">+</div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="fas fa-crown me-1"></i>
+                                غرفة خاصة
+                            </small>
+                            <button class="btn btn-warning btn-sm">
+                                <i class="fas fa-key me-1"></i>
+                                انضمام
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Room 5 -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="room-card" onclick="joinRoom(5)">
+                        <div class="room-header">
+                            <div class="room-title">تحدي السرعة</div>
+                            <div class="room-status status-playing">قيد اللعب</div>
+                        </div>
+                        <div class="room-info">
+                            <div class="info-item">
+                                <i class="fas fa-tag"></i>
+                                <span>متنوع</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-signal"></i>
+                                <span>متوسط</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-users"></i>
+                                <span>4/4</span>
+                            </div>
+                        </div>
+                        <div class="room-players">
+                            <div class="player-avatar">هند</div>
+                            <div class="player-avatar">يوسف</div>
+                            <div class="player-avatar">مريهام</div>
+                            <div class="player-avatar">بندر</div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="fas fa-clock me-1"></i>
+                                بدأت قبل 1 دقيقة
+                            </small>
+                            <button class="btn btn-secondary btn-sm" disabled>
+                                <i class="fas fa-eye me-1"></i>
+                                مشاهدة
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Room 6 -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="room-card" onclick="joinRoom(6)">
+                        <div class="room-header">
+                            <div class="room-title">غرفة المبتدئين</div>
+                            <div class="room-status status-waiting">في انتظار</div>
+                        </div>
+                        <div class="room-info">
+                            <div class="info-item">
+                                <i class="fas fa-tag"></i>
+                                <span>متنوع</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-signal"></i>
+                                <span>سهل</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-users"></i>
+                                <span>2/4</span>
+                            </div>
+                        </div>
+                        <div class="room-players">
+                            <div class="player-avatar">رنا</div>
+                            <div class="player-avatar">ماجد</div>
+                            <div class="empty-slot">+</div>
+                            <div class="empty-slot">+</div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="fas fa-graduation-cap me-1"></i>
+                                للطلاب الجدد
+                            </small>
+                            <button class="btn btn-primary btn-sm">
+                                <i class="fas fa-sign-in-alt me-1"></i>
+                                انضمام
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Chat Button -->
+    <div class="floating-chat-btn" onclick="toggleChat()">
+        <i class="fas fa-comments"></i>
+        <div class="online-indicator"></div>
+    </div>
+
+    <!-- Chat Container -->
+    <div class="chat-container" id="chatContainer">
+        <div class="chat-header">
+            <i class="fas fa-comments me-2"></i>
+            الدردشة العامة
+            <span class="badge bg-light me-auto">
+                <span id="chatOnlineCount">24</span> متصل
+            </span>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="message other">
+                <div class="message-author">محمد</div>
+                <div class="message-text">مرحباً يا جماعة! أحد يريد يلعب معا؟</div>
+                <div class="message-time">قبل 5 دقائق</div>
+            </div>
+            <div class="message other">
+                <div class="message-author">سارة</div>
+                <div class="message-text">أنا معك! أنشئ غرفة ونلعب</div>
+                <div class="message-time">قبل 3 دقائق</div>
+            </div>
+            <div class="message self">
+                <div class="message-author">أحمد</div>
+                <div class="message-text">أنا جاهز! في أي غرفة؟</div>
+                <div class="message-time">قبل دقيقة</div>
+            </div>
+        </div>
+        <div class="chat-input">
+            <div class="input-group">
+                <input type="text" class="form-control" id="chatInput" placeholder="اكتب رسالتك..." onkeypress="handleChatKeypress(event)">
+                <button class="btn btn-primary" onclick="sendMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Room Modal -->
+    <div class="modal fade" id="createRoomModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-primary text-white border-0">
+                    <h5 class="modal-title">
+                        <i class="fas fa-plus-circle me-2"></i>
+                        إنشاء غرفة جديدة
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="createRoomForm">
+                        <div class="mb-3">
+                            <label for="roomName" class="form-label">
+                                <i class="fas fa-tag me-2"></i>اسم الغرفة
+                            </label>
+                            <input type="text" class="form-control" id="roomName" required 
+                                   placeholder="مثال: تحدي الأصدقاء">
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="roomCategory" class="form-label">
+                                    <i class="fas fa-book me-2"></i>الفئة
+                                </label>
+                                <select class="form-select" id="roomCategory" required>
+                                    <option value="">اختر الفئة</option>
+                                    <option value="تاريخ">تاريخ</option>
+                                    <option value="جغرافيا">جغرافيا</option>
+                                    <option value="ثقافة">ثقافة</option>
+                                    <option value="متنوع">متنوع</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="roomDifficulty" class="form-label">
+                                    <i class="fas fa-signal me-2"></i>المستوى
+                                </label>
+                                <select class="form-select" id="roomDifficulty" required>
+                                    <option value="">اختر المستوى</option>
+                                    <option value="سهل">سهل</option>
+                                    <option value="متوسط">متوسط</option>
+                                    <option value="صعب">صعب</option>
+                                    <option value="محترف">محترف</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="maxPlayers" class="form-label">
+                                    <i class="fas fa-users me-2"></i>الحد الأقصى للاعبين
+                                </label>
+                                <select class="form-select" id="maxPlayers" required>
+                                    <option value="2">2 لاعبين</option>
+                                    <option value="4" selected>4 لاعبين</option>
+                                    <option value="6">6 لاعبين</option>
+                                    <option value="8">8 لاعبين</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="roomPassword" class="form-label">
+                                    <i class="fas fa-key me-2"></i>كلمة المرور (اختياري)
+                                </label>
+                                <input type="password" class="form-control" id="roomPassword" 
+                                       placeholder="للغرف الخاصة">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-cog me-2"></i>إعدادات إضافية
+                            </label>
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" id="allowSpectators" checked>
+                                <label class="form-check-label" for="allowSpectators">
+                                    السماح بالمشاهدين
+                                </label>
+                            </div>
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" id="enableChat" checked>
+                                <label class="form-check-label" for="enableChat">
+                                    تفعيل الدردشة
+                                </label>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="isPrivate">
+                                <label class="form-check-label" for="isPrivate">
+                                    غرفة خاصة
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        إلغاء
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="createRoom()">
+                        <i class="fas fa-plus me-2"></i>
+                        إنشاء الغرفة
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Multiplayer JavaScript -->
+    <script src="js/multiplayer.js"></script>
+</body>
+</html>

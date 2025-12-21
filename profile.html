@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الملف الشخصي - لعبة وريث</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Profile CSS -->
+    <style>
+        /* Profile Specific Styles */
+        .profile-container {
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+        
+        .profile-header {
+            background: linear-gradient(135deg, rgba(184, 116, 59, 0.9), rgba(141, 95, 59, 0.9));
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+        }
+        
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+        
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .profile-avatar .avatar-icon {
+            font-size: 3rem;
+            color: white;
+        }
+        
+        .profile-level {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--warning-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-weight: 700;
+            font-size: 0.875rem;
+        }
+        
+        .profile-info {
+            text-align: center;
+            color: white;
+        }
+        
+        .profile-name {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .profile-email {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 1rem;
+        }
+        
+        .profile-badges {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .badge-custom {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 1rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+            border: 2px solid var(--secondary-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15);
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+        }
+        
+        .stat-icon i {
+            font-size: 1.5rem;
+            color: white;
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            font-size: 1rem;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .achievements-section {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+            border: 2px solid var(--secondary-color);
+            margin-bottom: 2rem;
+        }
+        
+        .achievement-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .achievement-item {
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            background: var(--light-color);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .achievement-item:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 0.5rem 1rem rgba(184, 116, 59, 0.2);
+        }
+        
+        .achievement-item.unlocked {
+            background: linear-gradient(135deg, rgba(184, 116, 59, 0.1), rgba(141, 95, 59, 0.1));
+            border-color: var(--primary-color);
+        }
+        
+        .achievement-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .achievement-item.unlocked .achievement-icon {
+            color: var(--warning-color);
+        }
+        
+        .achievement-item.locked .achievement-icon {
+            color: #ccc;
+        }
+        
+        .achievement-name {
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .achievement-desc {
+            font-size: 0.875rem;
+            color: #666;
+        }
+        
+        .progress-section {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+            border: 2px solid var(--secondary-color);
+        }
+        
+        .level-progress {
+            margin-bottom: 2rem;
+        }
+        
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .progress-bar-custom {
+            height: 12px;
+            background: rgba(184, 116, 59, 0.2);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 6px;
+            transition: width 1s ease;
+        }
+        
+        .recent-games {
+            margin-top: 2rem;
+        }
+        
+        .game-history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background: var(--light-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .game-history-item:hover {
+            background: rgba(184, 116, 59, 0.1);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .stats-overview {
+                grid-template-columns: 1fr;
+            }
+            
+            .achievement-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body class="bg-heritage">
+    <!-- Background Pattern -->
+    <div class="bg-pattern"></div>
+    
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="dashboard.html">
+                <i class="fas fa-crown text-warning me-2"></i>
+                <span class="fw-bold">وريث</span>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard.html">
+                            <i class="fas fa-home me-1"></i>الرئيسية
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="game.html">
+                            <i class="fas fa-user me-1"></i>فردي
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="multiplayer.html">
+                            <i class="fas fa-users me-1"></i>جماعي
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="leaderboard.html">
+                            <i class="fas fa-trophy me-1"></i>المتصدرين
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="profile.html">
+                            <i class="fas fa-user me-1"></i>الملف الشخصي
+                        </a>
+                    </li>
+                </ul>
+                
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">
+                            <i class="fas fa-sign-out-alt me-1"></i>
+                            تسجيل الخروج
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Profile Container -->
+    <div class="profile-container position-relative">
+        <div class="container">
+            <!-- Profile Header -->
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <i class="fas fa-user-circle avatar-icon"></i>
+                    <span class="profile-level">متوسط</span>
+                </div>
+                <div class="profile-info">
+                    <h1 class="profile-name">أحمد محمد</h1>
+                    <p class="profile-email">ahmed.mohammed@email.com</p>
+                    <div class="profile-badges">
+                        <span class="badge-custom">
+                            <i class="fas fa-fire me-1"></i>نشط
+                        </span>
+                        <span class="badge-custom">
+                            <i class="fas fa-medal me-1"></i>خبير
+                        </span>
+                        <span class="badge-custom">
+                            <i class="fas fa-star me-1"></i>مميز
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Statistics Overview -->
+            <div class="stats-overview">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-gamepad"></i>
+                    </div>
+                    <div class="stat-value">24</div>
+                    <div class="stat-label">مباريات ملعوبة</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="stat-value">85%</div>
+                    <div class="stat-label">أفضل نتيجة</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="stat-value">1,250</div>
+                    <div class="stat-label">إجمالي النقاط</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-value">72%</div>
+                    <div class="stat-label">متوسط الدرجات</div>
+                </div>
+            </div>
+            
+            <!-- Progress Section -->
+            <div class="progress-section mb-4">
+                <h3 class="h4 fw-bold text-primary mb-4">
+                    <i class="fas fa-chart-bar me-2"></i>
+                    التقدم والمستوى
+                </h3>
+                
+                <div class="level-progress">
+                    <div class="progress-label">
+                        <span>المستوى الحالي: متوسط</span>
+                        <span>650 / 1000 نقطة</span>
+                    </div>
+                    <div class="progress-bar-custom">
+                        <div class="progress-fill" style="width: 65%"></div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="progress-label">
+                            <span>الأسئلة الصحيحة</span>
+                            <span>172 / 240</span>
+                        </div>
+                        <div class="progress-bar-custom">
+                            <div class="progress-fill" style="width: 72%"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="progress-label">
+                            <span>الإنجازات المكتملة</span>
+                            <span>8 / 15</span>
+                        </div>
+                        <div class="progress-bar-custom">
+                            <div class="progress-fill" style="width: 53%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recent Games -->
+                <div class="recent-games">
+                    <h4 class="h5 fw-bold text-primary mb-3">
+                        <i class="fas fa-history me-2"></i>
+                        المباريات الأخيرة
+                    </h4>
+                    <div class="game-history">
+                        <div class="game-history-item">
+                            <div>
+                                <strong>مستوى متوسط</strong>
+                                <br>
+                                <small class="text-muted">85 نقطة</small>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-success">85%</span>
+                                <br>
+                                <small class="text-muted">منذ 2 ساعة</small>
+                            </div>
+                        </div>
+                        
+                        <div class="game-history-item">
+                            <div>
+                                <strong>مستوى سهل</strong>
+                                <br>
+                                <small class="text-muted">90 نقطة</small>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-success">90%</span>
+                                <br>
+                                <small class="text-muted">منذ يوم</small>
+                            </div>
+                        </div>
+                        
+                        <div class="game-history-item">
+                            <div>
+                                <strong>مستوى صعب</strong>
+                                <br>
+                                <small class="text-muted">65 نقطة</small>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-warning">65%</span>
+                                <br>
+                                <small class="text-muted">منذ يومين</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Achievements Section -->
+            <div class="achievements-section">
+                <h3 class="h4 fw-bold text-primary mb-4">
+                    <i class="fas fa-medal me-2"></i>
+                    الإنجازات
+                </h3>
+                
+                <div class="achievement-grid">
+                    <div class="achievement-item unlocked">
+                        <div class="achievement-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="achievement-name">الفوز الأول</div>
+                        <div class="achievement-desc">أكمل أول لعبة</div>
+                    </div>
+                    
+                    <div class="achievement-item unlocked">
+                        <div class="achievement-icon">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div class="achievement-name">سلسلة انتصارات</div>
+                        <div class="achievement-desc">5 انتصارات متتالية</div>
+                    </div>
+                    
+                    <div class="achievement-item unlocked">
+                        <div class="achievement-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <div class="achievement-name">لاعب سريع</div>
+                        <div class="achievement-desc">أجب على 10 أسئلة في دقيقة</div>
+                    </div>
+                    
+                    <div class="achievement-item unlocked">
+                        <div class="achievement-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="achievement-name">مثالي</div>
+                        <div class="achievement-desc">100% في مباراة</div>
+                    </div>
+                    
+                    <div class="achievement-item unlocked">
+                        <div class="achievement-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <div class="achievement-name">خبير تراث</div>
+                        <div class="achievement-desc">100 سؤال صحيح</div>
+                    </div>
+                    
+                    <div class="achievement-item locked">
+                        <div class="achievement-icon">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <div class="achievement-name">بطل الأبطال</div>
+                        <div class="achievement-desc">أفضل 10 لاعبين</div>
+                    </div>
+                    
+                    <div class="achievement-item locked">
+                        <div class="achievement-icon">
+                            <i class="fas fa-rocket"></i>
+                        </div>
+                        <div class="achievement-name">صاروخ</div>
+                        <div class="achievement-desc">مستوى محترف في أسبوع</div>
+                    </div>
+                    
+                    <div class="achievement-item locked">
+                        <div class="achievement-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <div class="achievement-name">محب التراث</div>
+                        <div class="achievement-desc">50 مباراة</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Profile JavaScript -->
+    <script src="js/profile.js"></script>
+</body>
+</html>

@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم - لعبة وريث</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body class="bg-heritage">
+    <!-- Background Pattern -->
+    <div class="bg-pattern"></div>
+    
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="fas fa-crown text-warning me-2"></i>
+                <span class="fw-bold">وريث</span>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="dashboard.html">
+                            <i class="fas fa-home me-1"></i>الرئيسية
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="game.html">
+                            <i class="fas fa-user me-1"></i>فردي
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="multiplayer.html">
+                            <i class="fas fa-users me-1"></i>جماعي
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="leaderboard.html">
+                            <i class="fas fa-trophy me-1"></i>المتصدرين
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="profile.html">
+                            <i class="fas fa-user me-1"></i>الملف الشخصي
+                        </a>
+                    </li>
+                </ul>
+                
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle me-1"></i>
+                            أحمد محمد
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-start">
+                            <li><a class="dropdown-item" href="profile.html">
+                                <i class="fas fa-user me-2"></i>الملف الشخصي
+                            </a></li>
+                            <li><a class="dropdown-item" href="#">
+                                <i class="fas fa-cog me-2"></i>الإعدادات
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="index.html">
+                                <i class="fas fa-sign-out-alt me-2"></i>تسجيل الخروج
+                            </a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="py-5">
+        <div class="container">
+            <!-- Welcome Section -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="welcome-section text-center">
+                        <h1 class="display-4 fw-bold text-white mb-3">
+                            مرحباً بك يا أحمد محمد
+                        </h1>
+                        <p class="lead text-primary">
+                            اختبر معرفتك بالتراث السعودي وتحدى أصدقاءك
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- User Stats -->
+            <div class="row mb-5">
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="stat-card text-center p-4 rounded-3 bg-white shadow">
+                        <div class="stat-icon mb-3">
+                            <i class="fas fa-medal fa-3x text-warning"></i>
+                        </div>
+                        <h3 class="h5 text-primary mb-2">المستوى الحالي</h3>
+                        <div class="stat-value">
+                            <span class="display-6 fw-bold text-secondary">متوسط</span>
+                        </div>
+                        <div class="progress mt-3" style="height: 8px;">
+                            <div class="progress-bar bg-primary" style="width: 65%"></div>
+                        </div>
+                        <small class="text-muted mt-2 d-block">650 / 1000 نقطة</small>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="stat-card text-center p-4 rounded-3 bg-white shadow">
+                        <div class="stat-icon mb-3">
+                            <i class="fas fa-gamepad fa-3x text-primary"></i>
+                        </div>
+                        <h3 class="h5 text-primary mb-2">المباريات الملعوبة</h3>
+                        <div class="stat-value">
+                            <span class="display-6 fw-bold text-secondary">24</span>
+                        </div>
+                        <small class="text-muted mt-2 d-block">المباراة الأخيرة: منذ 2 ساعة</small>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="stat-card text-center p-4 rounded-3 bg-white shadow">
+                        <div class="stat-icon mb-3">
+                            <i class="fas fa-star fa-3x text-warning"></i>
+                        </div>
+                        <h3 class="h5 text-primary mb-2">أفضل نتيجة</h3>
+                        <div class="stat-value">
+                            <span class="display-6 fw-bold text-secondary">85%</span>
+                        </div>
+                        <small class="text-muted mt-2 d-block">85 / 100 نقطة</small>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="stat-card text-center p-4 rounded-3 bg-white shadow">
+                        <div class="stat-icon mb-3">
+                            <i class="fas fa-trophy fa-3x text-accent"></i>
+                        </div>
+                        <h3 class="h5 text-primary mb-2">الترتيب</h3>
+                        <div class="stat-value">
+                            <span class="display-6 fw-bold text-secondary">#12</span>
+                        </div>
+                        <small class="text-muted mt-2 d-block">من بين 156 لاعب</small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Cards -->
+            <div class="row mb-5">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="action-card h-100">
+                        <div class="card border-0 shadow-lg h-100">
+                            <div class="card-body text-center p-4">
+                                <div class="action-icon mb-3">
+                                    <i class="fas fa-play-circle fa-4x text-primary"></i>
+                                </div>
+                                <h3 class="h4 fw-bold text-primary mb-3">ابدأ التحدي</h3>
+                                <p class="text-muted mb-4">
+                                    اختبر معرفتك بالأسئلة التراثية السعودية في مستويات مختلفة
+                                </p>
+                                <a href="game.html" class="btn btn-primary btn-lg btn-custom w-100">
+                                    <i class="fas fa-play me-2"></i>
+                                    ابدأ اللعب
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="action-card h-100">
+                        <div class="card border-0 shadow-lg h-100">
+                            <div class="card-body text-center p-4">
+                                <div class="action-icon mb-3">
+                                    <i class="fas fa-users fa-4x text-secondary"></i>
+                                </div>
+                                <h3 class="h4 fw-bold text-primary mb-3">العب جماعي</h3>
+                                <p class="text-muted mb-4">
+                                    انضم إلى غرف اللعب وتحدى أصدقاءك في منافسات مثيرة
+                                </p>
+                                <a href="multiplayer.html" class="btn btn-secondary btn-lg btn-custom w-100">
+                                    <i class="fas fa-users me-2"></i>
+                                    غرف اللعب
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="action-card h-100">
+                        <div class="card border-0 shadow-lg h-100">
+                            <div class="card-body text-center p-4">
+                                <div class="action-icon mb-3">
+                                    <i class="fas fa-trophy fa-4x text-warning"></i>
+                                </div>
+                                <h3 class="h4 fw-bold text-primary mb-3">لوحة الصدارة</h3>
+                                <p class="text-muted mb-4">
+                                    شاهد أفضل اللاعبين وتحدى نفسك للوصول إلى القمة
+                                </p>
+                                <a href="leaderboard.html" class="btn btn-secondary btn-lg btn-custom w-100">
+                                    <i class="fas fa-trophy me-2"></i>
+                                    لوحة الصدارة
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="action-card h-100">
+                        <div class="card border-0 shadow-lg h-100">
+                            <div class="card-body text-center p-4">
+                                <div class="action-icon mb-3">
+                                    <i class="fas fa-user-circle fa-4x text-secondary"></i>
+                                </div>
+                                <h3 class="h4 fw-bold text-primary mb-3">ملفي الشخصي</h3>
+                                <p class="text-muted mb-4">
+                                    عرض إنجازاتك وتتبع تقدمك في اللعبة
+                                </p>
+                                <a href="profile.html" class="btn btn-secondary btn-lg btn-custom w-100">
+                                    <i class="fas fa-user me-2"></i>
+                                    الملف الشخصي
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Activity -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card border-0 shadow-lg">
+                        <div class="card-header bg-primary text-white">
+                            <h4 class="mb-0">
+                                <i class="fas fa-history me-2"></i>
+                                النشاط الأخير
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="activity-list">
+                                <div class="activity-item d-flex align-items-center mb-3 p-3 bg-light rounded">
+                                    <div class="activity-icon me-3">
+                                        <i class="fas fa-trophy text-warning fa-2x"></i>
+                                    </div>
+                                    <div class="activity-content flex-grow-1">
+                                        <h6 class="mb-1">لعبة مكتملة - مستوى متوسط</h6>
+                                        <p class="text-muted mb-0">حققت 75 نقطة من 100</p>
+                                    </div>
+                                    <div class="activity-time">
+                                        <small class="text-muted">منذ 2 ساعة</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="activity-item d-flex align-items-center mb-3 p-3 bg-light rounded">
+                                    <div class="activity-icon me-3">
+                                        <i class="fas fa-star text-primary fa-2x"></i>
+                                    </div>
+                                    <div class="activity-content flex-grow-1">
+                                        <h6 class="mb-1">مستوى جديد مفتوح</h6>
+                                        <p class="text-muted mb-0">متوسط - فتحت المستوى الجديد</p>
+                                    </div>
+                                    <div class="activity-time">
+                                        <small class="text-muted">منذ يوم</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="activity-item d-flex align-items-center mb-0 p-3 bg-light rounded">
+                                    <div class="activity-icon me-3">
+                                        <i class="fas fa-medal text-success fa-2x"></i>
+                                    </div>
+                                    <div class="activity-content flex-grow-1">
+                                        <h6 class="mb-1">إنجاز جديد</h6>
+                                        <p class="text-muted mb-0">لاعب نشط - أكملت 20 مباراة</p>
+                                    </div>
+                                    <div class="activity-time">
+                                        <small class="text-muted">منذ 3 أيام</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer py-4 bg-dark text-white mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0">
+                        <i class="fas fa-copyright me-1"></i>
+                        2024 فريق وريث - جميع الحقوق محفوظة
+                    </p>
+                </div>
+                <div class="col-md-6 text-md-start">
+                    <a href="#" class="text-white me-3">
+                        <i class="fas fa-question-circle me-1"></i>مساعدة
+                    </a>
+                    <a href="#" class="text-white me-3">
+                        <i class="fas fa-shield-alt me-1"></i>سياسة الخصوصية
+                    </a>
+                    <a href="#" class="text-white">
+                        <i class="fas fa-file-alt me-1"></i>الشروط
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
