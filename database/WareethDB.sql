@@ -423,26 +423,83 @@ INSERT INTO `users` (`username`, `email`, `password`, `level`, `total_score`, `g
 ('player4', 'player4@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'متوسط', 450, 20, 90, NOW(), 'inactive', 3, 1, 75, FALSE, DATE_SUB(NOW(), INTERVAL 3 HOUR));
 
 -- Insert sample questions
+INSERT INTO `questions` (`question_text`, `option_a`, `option_b`, `option_c`, `option_d`, `correct_answer`, `category`, `difficulty`, `points`, `status`) VALUES
+('ما هي عاصمة المملكة العربية السعودية؟', 'جدة', 'الرياض', 'الدمام', 'مكة المكرمة', 'B', 'جغرافيا', 'سهل', 10, 'active'),
+('في أي عام تم توحيد المملكة العربية السعودية؟', '1932', '1927', '1945', '1950', 'A', 'تاريخ', 'سهل', 10, 'active'),
+('ما هو أطول نهر في العالم؟', 'نهر النيل', 'نهر الأمازون', 'نهر اليانغتسي', 'نهر المسيسيبي', 'B', 'جغرافيا', 'متوسط', 15, 'active'),
+('من هو مؤلف كتاب "المنقذ من الضلال"؟', 'ابن سينا', 'الغزالي', 'ابن خلدون', 'ابن تيمية', 'B', 'ثقافة', 'صعب', 20, 'active'),
+('ما هي العملة الرسمية للمملكة العربية السعودية؟', 'الدرهم', 'الدينار', 'الريال', 'اليورو', 'C', 'اقتصاد', 'سهل', 10, 'active'),
+('ما هو اسم أول مملكة تم تأسيسها في شبه الجزيرة العربية؟', 'المملكة العربية السعودية', 'مملكة كندة', 'مملكة سبأ', 'مملكة حِمْيَر', 'B', 'تاريخ', 'متوسط', 10, 'active'),
+('ما هي أكبر مدينة من حيث المساحة في المملكة العربية السعودية؟', 'الرياض', 'مكة المكرمة', 'المدينة المنورة', 'الدمام', 'A', 'جغرافيا', 'سهل', 10, 'active'),
+('ما هو اسم العيد الوطني للمملكة العربية السعودية؟', 'عيد الفطر', 'عيد الأضحى', 'اليوم الوطني', 'عيد الجلوس', 'C', 'ثقافة', 'سهل', 10, 'active'),
+('في أي عام تم تأسيس المملكة العربية السعودية؟', '1925', '1932', '1945', '1950', 'B', 'تاريخ', 'متوسط', 10, 'active'),
+('كم عدد مناطق المملكة العربية السعودية الإدارية؟', '13', '15', '18', '20', 'A', 'جغرافيا', 'متوسط', 10, 'active');
 
 -- Insert sample scores (time_taken is in seconds)
-
+INSERT INTO `scores` (`user_id`, `score`, `total_questions`, `correct_answers`, `wrong_answers`, `skipped_answers`, `percentage`, `time_taken`, `difficulty_level`, `game_type`) VALUES
+(1, 85, 10, 8, 2, 0, 85.00, 272, 'متوسط', 'single'),
+(1, 90, 10, 9, 1, 0, 90.00, 225, 'سهل', 'single'),
+(1, 65, 10, 6, 4, 0, 65.00, 312, 'صعب', 'single'),
+(2, 95, 10, 9, 1, 0, 95.00, 200, 'محترف', 'single'),
+(2, 88, 10, 8, 2, 0, 88.00, 255, 'متوسط', 'single'),
+(3, 70, 10, 7, 3, 0, 70.00, 345, 'سهل', 'single'),
+(4, 92, 10, 9, 1, 0, 92.00, 230, 'متوسط', 'single'),
+(4, 78, 10, 7, 3, 0, 78.00, 270, 'سهل', 'single');
 
 -- Insert sample game rooms
+INSERT INTO `game_rooms` (`owner_id`, `room_name`, `room_code`, `category`, `difficulty`, `max_players`, `is_private`, `status`, `created_at`) VALUES
+(1, 'غرفة اللاعب الأول', 'ABC123', 'عام', 'متوسط', 4, FALSE, 'waiting', NOW()),
+(2, 'تحدي الثقافة', 'XYZ789', 'ثقافة', 'صعب', 3, TRUE, 'waiting', NOW()),
+(3, 'مسابقة التاريخ', 'HIST01', 'تاريخ', 'سهل', 2, FALSE, 'playing', NOW()),
+(4, 'من سيربح المليون', 'WINNER', 'عام', 'محترف', 4, FALSE, 'finished', DATE_SUB(NOW(), INTERVAL 1 HOUR));
 
 -- Insert sample room players
-
+INSERT INTO `room_players` (`room_id`, `user_id`, `is_owner`, `status`, `score`, `correct_answers`, `wrong_answers`) VALUES
+(1, 1, TRUE, 'ready', 0, 0, 0),
+(1, 2, FALSE, 'joined', 0, 0, 0),
+(2, 2, TRUE, 'ready', 0, 0, 0),
+(3, 3, TRUE, 'playing', 45, 4, 1),
+(3, 4, FALSE, 'playing', 30, 3, 2),
+(4, 1, FALSE, 'disconnected', 85, 8, 2),
+(4, 2, FALSE, 'disconnected', 92, 9, 1),
+(4, 3, FALSE, 'disconnected', 75, 7, 3),
+(4, 4, TRUE, 'disconnected', 100, 10, 0);
 
 -- Insert sample game results
+INSERT INTO `game_results` (`room_id`, `winner_id`, `total_questions`, `total_players`, `started_at`, `ended_at`) VALUES
+(4, 4, 10, 4, DATE_SUB(NOW(), INTERVAL 2 HOUR), DATE_SUB(NOW(), INTERVAL 1 HOUR));
 
 -- Update scores with game references
-
+UPDATE `scores` SET game_type = 'multiplayer', game_reference_id = 1 WHERE id IN (6, 7, 8, 9);
 
 -- Insert sample game questions
-
+INSERT INTO `game_questions` (`room_id`, `question_id`, `round_number`, `status`, `started_at`, `ended_at`) VALUES
+(3, 1, 1, 'answered', DATE_SUB(NOW(), INTERVAL 10 MINUTE), DATE_SUB(NOW(), INTERVAL 9 MINUTE)),
+(3, 2, 2, 'answered', DATE_SUB(NOW(), INTERVAL 8 MINUTE), DATE_SUB(NOW(), INTERVAL 7 MINUTE)),
+(3, 3, 3, 'answered', DATE_SUB(NOW(), INTERVAL 6 MINUTE), DATE_SUB(NOW(), INTERVAL 5 MINUTE)),
+(3, 4, 4, 'answered', DATE_SUB(NOW(), INTERVAL 4 MINUTE), DATE_SUB(NOW(), INTERVAL 3 MINUTE)),
+(3, 5, 5, 'active', DATE_SUB(NOW(), INTERVAL 2 MINUTE), NULL);
 
 -- Insert sample player answers
+INSERT INTO `player_answers` (`game_question_id`, `player_id`, `answer`, `is_correct`, `time_taken`, `points_earned`) VALUES
+(1, 3, 'B', TRUE, 12, 10),
+(1, 4, 'B', TRUE, 8, 10),
+(2, 3, 'A', TRUE, 15, 10),
+(2, 4, 'C', FALSE, 10, 0),
+(3, 3, 'B', TRUE, 20, 15),
+(3, 4, 'B', TRUE, 18, 15),
+(4, 3, 'A', FALSE, 10, 0),
+(4, 4, 'B', TRUE, 12, 15),
+(5, 3, 'C', NULL, NULL, NULL),
+(5, 4, 'C', NULL, NULL, NULL);
 
 -- Insert sample game messages
+INSERT INTO `game_messages` (`room_id`, `user_id`, `message_type`, `message_text`) VALUES
+(3, 3, 'text', 'مرحباً بالجميع!'),
+(3, 4, 'text', 'أهلاً بك!'),
+(3, 0, 'system', 'بدأت الجولة الأولى'),
+(3, 0, 'game_event', 'أجاب اللاعب 3 على السؤال بشكل صحيح (+10 نقاط)'),
+(3, 0, 'game_event', 'أجاب اللاعب 4 على السؤال بشكل صحيح (+10 نقاط)');
 
 -- Add foreign key constraint for game_reference_id after both tables are created
 ALTER TABLE `scores` 
@@ -451,3 +508,19 @@ FOREIGN KEY (`game_reference_id`) REFERENCES `game_results` (`id`)
 ON DELETE SET NULL;
 
 -- Insert sample user statistics (these would normally be updated by the trigger)
+INSERT INTO `user_statistics` (
+    `user_id`,
+    `total_questions_answered`,
+    `total_correct_answers`,
+    `total_wrong_answers`,
+    `total_time_played`,
+    `average_accuracy`,
+    `average_time_per_question`,
+    `favorite_category`,
+    `favorite_difficulty`,
+    `last_played`
+) VALUES
+(1, 30, 25, 5, 1200, 83.33, 40.00, 'جغرافيا', 'متوسط', NOW()),
+(2, 50, 45, 5, 1800, 90.00, 36.00, 'ثقافة', 'محترف', NOW()),
+(3, 15, 10, 5, 900, 66.67, 60.00, 'تاريخ', 'سهل', NOW()),
+(4, 40, 35, 5, 1500, 87.50, 37.50, 'عام', 'متوسط', NOW());

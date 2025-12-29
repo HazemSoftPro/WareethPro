@@ -1,3 +1,4 @@
+
 // Multiplayer Game JavaScript
 class MultiplayerGame {
     constructor() {
@@ -294,7 +295,7 @@ class MultiplayerGame {
                 if (joinButton) {
                     joinButton.className = 'btn btn-secondary btn-sm';
                     joinButton.innerHTML = '<i class="fas fa-eye me-1"></i> مشاهدة';
-                    joinButton.onclick = () => joinRoom(room.id);
+                    joinButton.onclick = () => this.spectateRoom(room.id);
                 }
             } else {
                 statusElement.className = 'room-status status-waiting';
@@ -303,7 +304,7 @@ class MultiplayerGame {
                 if (joinButton && room.currentPlayers < room.maxPlayers) {
                     joinButton.className = 'btn btn-primary btn-sm';
                     joinButton.innerHTML = '<i class="fas fa-sign-in-alt me-1"></i> انضمام';
-                    joinButton.onclick = () => joinRoom(room.id);
+                    joinButton.onclick = () => this.joinRoom(room.id);
                 }
             }
             
@@ -398,12 +399,12 @@ class MultiplayerGame {
             room.players.push(this.currentUser);
             room.currentPlayers++;
         }
-
+        
         this.currentRoom = room;
         this.isInRoom = true;
-
+        
         this.showAlert(`انضممت إلى غرفة ${room.name}`, 'success');
-
+        
         // Prepare room data for multiplayer game
         const roomData = {
             id: room.id,
@@ -418,7 +419,7 @@ class MultiplayerGame {
             powerupsEnabled: room.powerupsEnabled,
             enableChat: room.enableChat
         };
-
+        
         // Save room data to localStorage
         localStorage.setItem('currentRoom', JSON.stringify(roomData));
         
@@ -430,26 +431,23 @@ class MultiplayerGame {
             case 'الحرف': categoryParam = 'حرف'; break;
             case 'الأكل': categoryParam = 'أكل'; break;
             case 'المختلطة': 
-                // للفئة المختلطة، نختار فئة عشوائية من الفئات الأربع
+                // للفئة المختلطة، نختار فئة عشوائية
                 const categories = ['عبارات', 'أزياء', 'حرف', 'أكل'];
                 categoryParam = categories[Math.floor(Math.random() * categories.length)];
                 break;
             default: categoryParam = 'عبارات';
         }
         
-        // تحديد إذا كان المستخدم هو منشئ الغرفة (أول لاعب)
-        const isOwner = room.players[0] === this.currentUser;
-        
-        // Navigate to multiplayer game room مع الفئة الصحيحة
+        // Navigate to multiplayer game room مع الفئة
         setTimeout(() => {
-            window.location.href = `multiplayer-game.html?room=${roomId}&category=${categoryParam}${isOwner ? '&owner=true' : ''}`;
+            window.location.href = `multiplayer-game.html?room=${roomId}&category=${categoryParam}`;
         }, 1500);
     }
     
     spectateRoom(roomId) {
         const room = this.rooms.find(r => r.id === roomId);
         this.showAlert(`أنت تشاهد غرفة ${room.name}`, 'info');
-
+        
         // Save spectator status
         localStorage.setItem('isSpectator', 'true');
         
@@ -466,7 +464,7 @@ class MultiplayerGame {
                 break;
             default: categoryParam = 'عبارات';
         }
-
+        
         // Navigate to spectator view مع الفئة
         setTimeout(() => {
             window.location.href = `multiplayer-game.html?room=${roomId}&spectator=true&category=${categoryParam}`;
@@ -506,7 +504,7 @@ class MultiplayerGame {
             form.reportValidity();
             return;
         }
-
+        
         const roomName = document.getElementById('roomName').value;
         const roomCategory = document.getElementById('roomCategory').value;
         const roomDifficulty = document.getElementById('roomDifficulty').value;
@@ -516,7 +514,7 @@ class MultiplayerGame {
         const allowSpectators = document.getElementById('allowSpectators').checked;
         const enableChat = document.getElementById('enableChat').checked;
         const enablePowerups = document.getElementById('enablePowerups').checked;
-
+        
         // Calculate questions count based on difficulty
         let questionsCount;
         switch(roomDifficulty) {
@@ -526,7 +524,7 @@ class MultiplayerGame {
             case 'محترف': questionsCount = 25; break;
             default: questionsCount = 15;
         }
-
+        
         const roomData = {
             id: Date.now(),
             name: roomName,
@@ -546,20 +544,20 @@ class MultiplayerGame {
             questionsCount: questionsCount,
             isPrivate: roomPassword !== ''
         };
-
+        
         // Add room to list
         this.rooms.push(roomData);
-
+        
         // Show success message
         this.showNotification(`تم إنشاء غرفة ${roomData.name} بنجاح!`, 'success');
-
+        
         // Close modal
         const modal = bootstrap.Modal.getInstance(document.getElementById('createRoomModal'));
         modal.hide();
-
+        
         // Reset form
         form.reset();
-
+        
         // Save room data to localStorage for the game
         localStorage.setItem('currentRoom', JSON.stringify(roomData));
         
@@ -576,10 +574,10 @@ class MultiplayerGame {
                 break;
             default: categoryParam = 'عبارات';
         }
-
+        
         // Navigate to the room after a short delay مع الفئة
         setTimeout(() => {
-            window.location.href = `multiplayer-game.html?room=${roomData.id}&category=${categoryParam}&owner=true`;
+            window.location.href = `multiplayer-game.html?room=${roomData.id}&owner=true&category=${categoryParam}`;
         }, 2000);
     }
     
@@ -727,174 +725,25 @@ class MultiplayerGame {
     }
 }
 
-// تهيئة متغير عام للعبة
-let multiplayerGameInstance = null;
-
-// تهيئة اللعبة عندما يتم تحميل الصفحة
+// Initialize multiplayer game
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM loaded, initializing MultiplayerGame...');
-    multiplayerGameInstance = new MultiplayerGame();
-    console.log('MultiplayerGame initialized successfully');
+    window.multiplayerGame = new MultiplayerGame();
+    
+    // Make functions globally available
+    window.showCreateRoomModal = () => window.multiplayerGame.showCreateRoomModal();
+    window.createRoom = () => window.multiplayerGame.createRoom();
+    window.joinRoom = (id) => window.multiplayerGame.joinRoom(id);
+    window.spectateRoom = (id) => window.multiplayerGame.spectateRoom(id);
+    window.joinPrivateRoom = (id) => window.multiplayerGame.joinPrivateRoom(id);
+    window.joinPrivateRoomConfirm = () => window.multiplayerGame.joinPrivateRoomConfirm();
+    window.toggleChat = () => window.multiplayerGame.toggleChat();
+    window.sendMessage = () => window.multiplayerGame.sendMessage();
+    window.handleChatKeypress = (e) => window.multiplayerGame.handleChatKeypress(e);
 });
-
-// تعريف الوظائف العالمية مع فحص إذا كانت اللعبة معدة
-window.showCreateRoomModal = function() {
-    console.log('showCreateRoomModal called');
-    if (multiplayerGameInstance) {
-        multiplayerGameInstance.showCreateRoomModal();
-    } else {
-        console.warn('Game instance not initialized yet, retrying...');
-        setTimeout(() => {
-            if (multiplayerGameInstance) {
-                multiplayerGameInstance.showCreateRoomModal();
-            } else {
-                alert('جاري تحميل النظام، الرجاء المحاولة مرة أخرى بعد لحظة');
-            }
-        }, 300);
-    }
-};
-
-window.createRoom = function() {
-    console.log('createRoom called');
-    if (multiplayerGameInstance) {
-        multiplayerGameInstance.createRoom();
-    } else {
-        console.warn('Game instance not initialized yet, retrying...');
-        setTimeout(() => {
-            if (multiplayerGameInstance) {
-                multiplayerGameInstance.createRoom();
-            } else {
-                alert('جاري تحميل النظام، الرجاء المحاولة مرة أخرى بعد لحظة');
-            }
-        }, 300);
-    }
-};
-
-window.joinRoom = function(id) {
-    console.log('joinRoom called with id:', id);
-    if (multiplayerGameInstance) {
-        multiplayerGameInstance.joinRoom(id);
-    } else {
-        console.warn('Game instance not initialized yet, retrying...');
-        // إعادة المحاولة بعد وقت قصير
-        setTimeout(() => {
-            if (multiplayerGameInstance) {
-                multiplayerGameInstance.joinRoom(id);
-            } else {
-                alert('جاري تحميل النظام، الرجاء المحاولة مرة أخرى بعد لحظة');
-            }
-        }, 500);
-    }
-};
-
-window.spectateRoom = function(id) {
-    console.log('spectateRoom called with id:', id);
-    if (multiplayerGameInstance) {
-        multiplayerGameInstance.spectateRoom(id);
-    } else {
-        console.warn('Game instance not initialized yet, retrying...');
-        setTimeout(() => {
-            if (multiplayerGameInstance) {
-                multiplayerGameInstance.spectateRoom(id);
-            } else {
-                alert('جاري تحميل النظام، الرجاء المحاولة مرة أخرى بعد لحظة');
-            }
-        }, 500);
-    }
-};
-
-window.joinPrivateRoom = function(id) {
-    console.log('joinPrivateRoom called with id:', id);
-    if (multiplayerGameInstance) {
-        multiplayerGameInstance.joinPrivateRoom(id);
-    } else {
-        console.warn('Game instance not initialized yet, retrying...');
-        setTimeout(() => {
-            if (multiplayerGameInstance) {
-                multiplayerGameInstance.joinPrivateRoom(id);
-            } else {
-                alert('جاري تحميل النظام، الرجاء المحاولة مرة أخرى بعد لحظة');
-            }
-        }, 500);
-    }
-};
-
-window.joinPrivateRoomConfirm = function() {
-    console.log('joinPrivateRoomConfirm called');
-    if (multiplayerGameInstance) {
-        multiplayerGameInstance.joinPrivateRoomConfirm();
-    } else {
-        console.warn('Game instance not initialized yet, retrying...');
-        setTimeout(() => {
-            if (multiplayerGameInstance) {
-                multiplayerGameInstance.joinPrivateRoomConfirm();
-            } else {
-                alert('جاري تحميل النظام، الرجاء المحاولة مرة أخرى بعد لحظة');
-            }
-        }, 500);
-    }
-};
-
-window.toggleChat = function() {
-    console.log('toggleChat called');
-    if (multiplayerGameInstance) {
-        multiplayerGameInstance.toggleChat();
-    } else {
-        console.warn('Game instance not initialized yet, retrying...');
-        setTimeout(() => {
-            if (multiplayerGameInstance) {
-                multiplayerGameInstance.toggleChat();
-            }
-        }, 500);
-    }
-};
-
-window.sendMessage = function() {
-    console.log('sendMessage called');
-    if (multiplayerGameInstance) {
-        multiplayerGameInstance.sendMessage();
-    } else {
-        console.warn('Game instance not initialized yet, retrying...');
-        setTimeout(() => {
-            if (multiplayerGameInstance) {
-                multiplayerGameInstance.sendMessage();
-            }
-        }, 500);
-    }
-};
-
-window.handleChatKeypress = function(e) {
-    console.log('handleChatKeypress called');
-    if (multiplayerGameInstance) {
-        multiplayerGameInstance.handleChatKeypress(e);
-    } else {
-        console.warn('Game instance not initialized yet, retrying...');
-        setTimeout(() => {
-            if (multiplayerGameInstance) {
-                multiplayerGameInstance.handleChatKeypress(e);
-            }
-        }, 500);
-    }
-};
 
 // Auto-refresh rooms periodically
 setInterval(() => {
-    if (multiplayerGameInstance) {
-        multiplayerGameInstance.updateRoomsList();
+    if (window.multiplayerGame) {
+        window.multiplayerGame.updateRoomsList();
     }
 }, 30000);
-
-// Function to initialize category icon (called from multiplayer.html)
-window.updateCategoryIcon = function() {
-    console.log('updateCategoryIcon called');
-    if (multiplayerGameInstance) {
-        multiplayerGameInstance.updateCategoryIcon();
-    } else {
-        console.warn('Game instance not initialized yet, retrying...');
-        setTimeout(() => {
-            if (multiplayerGameInstance) {
-                multiplayerGameInstance.updateCategoryIcon();
-            }
-        }, 500);
-    }
-};

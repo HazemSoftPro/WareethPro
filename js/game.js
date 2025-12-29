@@ -1,12 +1,8 @@
-/**
- * Updated Game JavaScript with API Integration
- * لعبة جافاسكريبت محددة مع تكامل الـ API
- */
-
+// Game JavaScript
 class Game {
     constructor() {
         this.currentQuestion = 0;
-        this.questions = [];
+        this.totalQuestions = 10;
         this.score = 0;
         this.timeLeft = 30;
         this.timerInterval = null;
@@ -16,88 +12,364 @@ class Game {
             'skip': 1,
             'audience': 2
         };
+        this.questions = [];
+        this.currentQuestionData = null;
         this.answers = [];
-        this.gameSession = null;
-        this.questionStartTime = null;
+        this.gameActive = false;
         
         this.init();
     }
-
+    
     async init() {
+        await this.loadQuestions();
+        this.startGame();
+    }
+    
+    async loadQuestions() {
         try {
-            // Start game session
-            await this.startGameSession();
+            // استيراد الأسئلة من ملف محلي أو API
+            this.questions = this.getLocalQuestions();
             
-            // Load first question
-            this.loadQuestion();
-            this.startTimer();
-            this.updateUI();
+            // خلط الأسئلة عشوائياً
+            this.shuffleQuestions();
+            
+            // اختيار أول 10 أسئلة فقط
+            this.questions = this.questions.slice(0, 10);
+            
+            this.totalQuestions = this.questions.length;
+            
         } catch (error) {
-            console.error('Game initialization error:', error);
-            wareethAPI.showAlert('فشل بدء اللعبة', 'danger');
-            window.location.href = 'dashboard.html';
+            console.error('خطأ في تحميل الأسئلة:', error);
+            // استخدم الأسئلة الافتراضية في حالة الخطأ
+            this.questions = this.getDefaultQuestions();
+            this.totalQuestions = this.questions.length;
         }
     }
-
-    async startGameSession() {
-        // Get game configuration from URL parameters or defaults
-        const urlParams = new URLSearchParams(window.location.search);
-        const gameConfig = {
-            difficulty: urlParams.get('difficulty') || 'all',
-            category: urlParams.get('category') || 'all',
-            questionCount: parseInt(urlParams.get('questions')) || 10
-        };
-
-        try {
-            const response = await warethAPI.startGame(gameConfig);
-            
-            if (response.success) {
-                this.gameSession = {
-                    game_id: response.data.game_id,
-                    questions: response.data.questions,
-                    current_question: 0,
-                    score: 0,
-                    difficulty: response.data.difficulty,
-                    category: response.data.category
-                };
-                
-                this.questions = response.data.questions;
-                this.score = 0;
-                this.currentQuestion = 0;
-            } else {
-                throw new Error(response.message);
+    
+    getLocalQuestions() {
+        // إنشاء الأسئلة من الملف النصي
+        const questions = [];
+        
+        // قسم العبارات
+        const expressions = [
+            {
+                question: 'ما هو المعنى الدقيق لعبارة "ابعد مِشْحاه"؟',
+                options: [
+                    'أي أنه سار مسافة طويلة ووصل إليه بطريقة سريعة.',
+                    'أي أنه ابتعد وهاجر إلى مكان لم يعد يعرفه.',
+                    'أي أبعده وأقصاه إلى مكان بعيد.',
+                    'أي أنه سليم النية وطيب السمعة.'
+                ],
+                correct: 'C',
+                category: 'العبارات'
+            },
+            {
+                question: 'عبارة "أبو العمرين وأبو الزمريْن" تُطلق على:',
+                options: [
+                    'الشخص الذي يمتلك مكانة عالية في القوم.',
+                    'صاحب الأفعال الطيبة وعظيم الشأن وطيب السمعة.',
+                    'الرجل الذي يمتلك عمراً طويلاً وزوجتين.',
+                    'المرأة التي تقول عن زوجها أنه "أبو العمرين والزمريْن" لتقصيره.'
+                ],
+                correct: 'B',
+                category: 'العبارات'
+            },
+            {
+                question: 'ماذا يُقصد بمن "أخذ سُمُّ الحُمُّوس"؟',
+                options: [
+                    'أي أنه تمهل وتأخر في إظهار الغضب.',
+                    'أي أنه شُفي من غضبه وحممه.',
+                    'أي أنه تمادى في الغضب.',
+                    'أي كان أول من صب عليه الغاضب غضبه، أو أول من ضُرب في مشاجرة.'
+                ],
+                correct: 'D',
+                category: 'العبارات'
             }
-        } catch (error) {
-            throw error;
+        ];
+        
+        // قسم الأزياء
+        const fashion = [
+            {
+                question: 'ما هو الزي الخارجي الأساسي للرجل في معظم بادية نجد والذي يتميز بأكمام واسعة ومثلثة الشكل؟',
+                options: [
+                    'البشت',
+                    'السديري',
+                    'المرودن',
+                    'الزبون'
+                ],
+                correct: 'C',
+                category: 'الأزياء'
+            },
+            {
+                question: 'ما هي القطعة المربعة الشكل التي يضعها الرجل على رأسه وتثنى على شكل مثلث، وقد يطلق عليها اسم "مروجنة"؟',
+                options: [
+                    'الشماغ',
+                    'الغترة',
+                    'المعم',
+                    'الطاقية'
+                ],
+                correct: 'B',
+                category: 'الأزياء'
+            },
+            {
+                question: 'ما هي الخامة التي كان يُصنع منها "العقال" التقليدي الذي يستخدمه عامة البدو محلياً؟',
+                options: [
+                    'الحرير المستورد',
+                    'وبر الإبل',
+                    'صوف الماعز',
+                    'قماش القطيفة'
+                ],
+                correct: 'C',
+                category: 'الأزياء'
+            }
+        ];
+        
+        // قسم الحرف
+        const crafts = [
+            {
+                question: 'ما هي إحدى المنتجات التي يصنعها الحداد وتُستخدم في الحرب؟',
+                options: [
+                    'المكاييل',
+                    'المحاميس',
+                    'السيوف',
+                    'الزرابيل'
+                ],
+                correct: 'C',
+                category: 'الحرف اليدوية'
+            },
+            {
+                question: 'ما هي الأداة الحديدية التي يصنعها الحداد من الحديد الصُّلب وتُستخدم لـ ضرب الصوان بقَدْح ويَنْبَعِث عنه شرار يُوجِه للفتيلة لإشعالها؟',
+                options: [
+                    'الشلف',
+                    'المنكاب',
+                    'المطرقة',
+                    'الزَّنُود'
+                ],
+                correct: 'D',
+                category: 'الحرف اليدوية'
+            },
+            {
+                question: 'تُصنع المحاميس من حديد المِطَل، وتُستعمل لتحميس ماذا؟',
+                options: [
+                    'الجلود',
+                    'الغرب',
+                    'سعف النخيل',
+                    'حبوب القهوة'
+                ],
+                correct: 'D',
+                category: 'الحرف اليدوية'
+            }
+        ];
+        
+        // قسم الأكل
+        const food = [
+            {
+                question: 'ما هو المصطلح العام الذي يطلق على ما يشبع الجوع أو يتم تناوله كغذاء، مثل القمح والخبز؟',
+                options: [
+                    'الدهن',
+                    'الإدام',
+                    'العيش',
+                    'المرق'
+                ],
+                correct: 'C',
+                category: 'الأكل'
+            },
+            {
+                question: 'ما هو المصطلح الذي يشير إلى اللحم أو الفتات الذي يؤخذ من الحيوان؟',
+                options: [
+                    'السمن',
+                    'الشفرة',
+                    'اللحم',
+                    'الجندل'
+                ],
+                correct: 'C',
+                category: 'الأكل'
+            },
+            {
+                question: 'ما هو المشروب الذي يعد من مشتقات الحليب ويصنف ضمن الأغذية السائلة؟',
+                options: [
+                    'السمن',
+                    'الماء',
+                    'اللبن',
+                    'العيش'
+                ],
+                correct: 'C',
+                category: 'الأكل'
+            }
+        ];
+        
+        // دمج جميع الأسئلة
+        questions.push(...expressions, ...fashion, ...crafts, ...food);
+        
+        return questions;
+    }
+    
+    getDefaultQuestions() {
+        return [
+            {
+                question: 'ما هو المعنى الدقيق لعبارة "ابعد مِشْحاه"؟',
+                options: [
+                    'أي أنه سار مسافة طويلة ووصل إليه بطريقة سريعة.',
+                    'أي أنه ابتعد وهاجر إلى مكان لم يعد يعرفه.',
+                    'أي أبعده وأقصاه إلى مكان بعيد.',
+                    'أي أنه سليم النية وطيب السمعة.'
+                ],
+                correct: 'C',
+                category: 'العبارات'
+            },
+            {
+                question: 'عبارة "أبو العمرين وأبو الزمريْن" تُطلق على:',
+                options: [
+                    'الشخص الذي يمتلك مكانة عالية في القوم.',
+                    'صاحب الأفعال الطيبة وعظيم الشأن وطيب السمعة.',
+                    'الرجل الذي يمتلك عمراً طويلاً وزوجتين.',
+                    'المرأة التي تقول عن زوجها أنه "أبو العمرين والزمريْن" لتقصيره.'
+                ],
+                correct: 'B',
+                category: 'العبارات'
+            },
+            {
+                question: 'ما هو الزي الخارجي الأساسي للرجل في معظم بادية نجد والذي يتميز بأكمام واسعة ومثلثة الشكل؟',
+                options: [
+                    'البشت',
+                    'السديري',
+                    'المرودن',
+                    'الزبون'
+                ],
+                correct: 'C',
+                category: 'الأزياء'
+            },
+            {
+                question: 'ما هي الخامة التي كان يُصنع منها "العقال" التقليدي الذي يستخدمه عامة البدو محلياً؟',
+                options: [
+                    'الحرير المستورد',
+                    'وبر الإبل',
+                    'صوف الماعز',
+                    'قماش القطيفة'
+                ],
+                correct: 'C',
+                category: 'الأزياء'
+            },
+            {
+                question: 'ما هي إحدى المنتجات التي يصنعها الحداد وتُستخدم في الحرب؟',
+                options: [
+                    'المكاييل',
+                    'المحاميس',
+                    'السيوف',
+                    'الزرابيل'
+                ],
+                correct: 'C',
+                category: 'الحرف اليدوية'
+            },
+            {
+                question: 'تُصنع المحاميس من حديد المِطَل، وتُستعمل لتحميس ماذا؟',
+                options: [
+                    'الجلود',
+                    'الغرب',
+                    'سعف النخيل',
+                    'حبوب القهوة'
+                ],
+                correct: 'D',
+                category: 'الحرف اليدوية'
+            },
+            {
+                question: 'ما هو المصطلح العام الذي يطلق على ما يشبع الجوع أو يتم تناوله كغذاء، مثل القمح والخبز؟',
+                options: [
+                    'الدهن',
+                    'الإدام',
+                    'العيش',
+                    'المرق'
+                ],
+                correct: 'C',
+                category: 'الأكل'
+            },
+            {
+                question: 'ما هو المصطلح الذي يشير إلى اللحم أو الفتات الذي يؤخذ من الحيوان؟',
+                options: [
+                    'السمن',
+                    'الشفرة',
+                    'اللحم',
+                    'الجندل'
+                ],
+                correct: 'C',
+                category: 'الأكل'
+            },
+            {
+                question: 'ما هو المشروب الذي يعد من مشتقات الحليب ويصنف ضمن الأغذية السائلة؟',
+                options: [
+                    'السمن',
+                    'الماء',
+                    'اللبن',
+                    'العيش'
+                ],
+                correct: 'C',
+                category: 'الأكل'
+            },
+            {
+                question: 'ماذا يُقصد بمن "أخذ سُمُّ الحُمُّوس"؟',
+                options: [
+                    'أي أنه تمهل وتأخر في إظهار الغضب.',
+                    'أي أنه شُفي من غضبه وحممه.',
+                    'أي أنه تمادى في الغضب.',
+                    'أي كان أول من صب عليه الغاضب غضبه، أو أول من ضُرب في مشاجرة.'
+                ],
+                correct: 'D',
+                category: 'العبارات'
+            }
+        ];
+    }
+    
+    shuffleQuestions() {
+        for (let i = this.questions.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [this.questions[i], this.questions[j]] = [this.questions[j], this.questions[i]];
         }
     }
-
+    
+    startGame() {
+        this.gameActive = true;
+        this.currentQuestion = 0;
+        this.score = 0;
+        this.answers = [];
+        this.loadQuestion();
+        this.updateUI();
+    }
+    
     loadQuestion() {
         if (this.currentQuestion >= this.questions.length) {
             this.endGame();
             return;
         }
-
+        
         this.currentQuestionData = this.questions[this.currentQuestion];
         this.selectedAnswer = null;
-        this.questionStartTime = Date.now();
+        
+        // Reset timer
+        this.timeLeft = 30;
+        this.updateTimer();
+        
+        // Start timer
+        this.startTimer();
         
         // Update question text
-        document.getElementById('questionText').textContent = this.currentQuestionData.question_text;
+        document.getElementById('questionText').textContent = this.currentQuestionData.question;
         document.getElementById('categoryName').textContent = this.currentQuestionData.category;
-        document.getElementById('questionCounter').textContent = `سؤال ${this.currentQuestion + 1} من ${this.questions.length}`;
+        document.getElementById('questionCounter').textContent = `سؤال ${this.currentQuestion + 1} من ${this.totalQuestions}`;
         
         // Update options
         const options = document.querySelectorAll('.answer-option');
-        const optionLetters = ['A', 'B', 'C', 'D'];
-        const optionKeys = ['option_a', 'option_b', 'option_c', 'option_d'];
-        
         options.forEach((option, index) => {
             const optionText = option.querySelector('.answer-text');
-            optionText.textContent = this.currentQuestionData[optionKeys[index]];
-            option.setAttribute('data-answer', optionLetters[index]);
+            optionText.textContent = this.currentQuestionData.options[index];
             option.classList.remove('selected', 'correct', 'incorrect');
             option.style.display = 'block';
+            option.style.pointerEvents = 'auto';
+            
+            // Remove percentage badges
+            const badge = option.querySelector('.percentage-badge');
+            if (badge) {
+                badge.remove();
+            }
         });
         
         // Reset submit button
@@ -105,12 +377,15 @@ class Game {
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<i class="fas fa-check me-2"></i>تأكيد الإجابة';
         
-        // Reset timer
-        this.timeLeft = 30;
-        this.updateTimer();
+        // Enable hint buttons
+        this.enableHintButtons();
     }
-
+    
     startTimer() {
+        if (this.timerInterval) {
+            clearInterval(this.timerInterval);
+        }
+        
         this.timerInterval = setInterval(() => {
             this.timeLeft--;
             this.updateTimer();
@@ -120,7 +395,7 @@ class Game {
             }
         }, 1000);
     }
-
+    
     updateTimer() {
         const timerElement = document.getElementById('timer');
         const timerText = document.getElementById('timerText');
@@ -135,8 +410,10 @@ class Game {
             timerElement.classList.add('danger');
         }
     }
-
-    async selectAnswer(element, answer) {
+    
+    selectAnswer(element, answer) {
+        if (!this.gameActive) return;
+        
         // Remove previous selection
         document.querySelectorAll('.answer-option').forEach(option => {
             option.classList.remove('selected');
@@ -149,11 +426,9 @@ class Game {
         // Enable submit button
         document.getElementById('submitBtn').disabled = false;
     }
-
-    async submitAnswer() {
-        if (!this.selectedAnswer) return;
-        
-        const timeTaken = Math.floor((Date.now() - this.questionStartTime) / 1000);
+    
+    submitAnswer() {
+        if (!this.selectedAnswer || !this.gameActive) return;
         
         // Stop timer
         clearInterval(this.timerInterval);
@@ -163,152 +438,146 @@ class Game {
             option.style.pointerEvents = 'none';
         });
         
-        try {
-            // Submit answer to API
-            const response = await warethAPI.submitAnswer({
-                questionIndex: this.currentQuestion,
-                answer: this.selectedAnswer,
-                timeTaken: timeTaken
-            });
-            
-            if (response.success) {
-                const isCorrect = response.data.is_correct;
-                const correctAnswer = response.data.correct_answer;
-                const pointsEarned = response.data.points_earned;
-                
-                // Update score
-                this.score = response.data.total_score;
-                
-                // Show correct answer
-                const correctOption = document.querySelector(`.answer-option[data-answer="${correctAnswer}"]`);
-                correctOption.classList.add('correct');
-                
-                // Show incorrect answer if wrong
-                if (!isCorrect && this.selectedAnswer) {
-                    const selectedOption = document.querySelector('.answer-option.selected');
-                    selectedOption.classList.add('incorrect');
-                }
-                
-                // Store answer
-                this.answers.push({
-                    question_index: this.currentQuestion,
-                    question: this.currentQuestionData.question_text,
-                    selected: this.selectedAnswer,
-                    correct: correctAnswer,
-                    isCorrect: isCorrect,
-                    points: pointsEarned,
-                    timeTaken: timeTaken
-                });
-                
-                // Update UI
-                this.updateUI();
-                
-                // Update submit button
-                const submitBtn = document.getElementById('submitBtn');
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = isCorrect ? 
-                    '<i class="fas fa-check-circle me-2"></i>إجابة صحيحة!' : 
-                    '<i class="fas fa-times-circle me-2"></i>إجابة خاطئة!';
-                
-                // Show result modal
-                setTimeout(() => {
-                    this.showResult(isCorrect, correctAnswer, pointsEarned);
-                }, 1500);
-            } else {
-                throw new Error(response.message);
-            }
-        } catch (error) {
-            warethAPI.handleAPIError(error, 'فشل إرسال الإجابة');
+        // Disable hint buttons
+        this.disableHintButtons();
+        
+        // Show correct answer
+        const correctIndex = this.getOptionIndex(this.currentQuestionData.correct);
+        const correctOption = document.querySelector(`.answer-option:nth-child(${correctIndex})`);
+        if (correctOption) {
+            correctOption.classList.add('correct');
         }
+        
+        // Show incorrect answer if wrong
+        if (this.selectedAnswer !== this.currentQuestionData.correct) {
+            const selectedOption = document.querySelector('.answer-option.selected');
+            if (selectedOption) {
+                selectedOption.classList.add('incorrect');
+            }
+        }
+        
+        // Calculate score
+        const isCorrect = this.selectedAnswer === this.currentQuestionData.correct;
+        let questionScore = 0;
+        
+        if (isCorrect) {
+            // Base points + bonus for speed
+            questionScore = 10;
+            const timeBonus = Math.floor(this.timeLeft / 3);
+            questionScore += timeBonus;
+            this.score += questionScore;
+        }
+        
+        // Store answer
+        this.answers.push({
+            question: this.currentQuestionData.question,
+            selected: this.selectedAnswer,
+            correct: this.currentQuestionData.correct,
+            isCorrect: isCorrect,
+            score: questionScore,
+            timeLeft: this.timeLeft
+        });
+        
+        // Update UI
+        this.updateUI();
+        
+        // Update submit button
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = isCorrect ? 
+            `<i class="fas fa-check-circle me-2"></i>إجابة صحيحة! (+${questionScore})` : 
+            '<i class="fas fa-times-circle me-2"></i>إجابة خاطئة!';
+        
+        // Show result modal
+        setTimeout(() => {
+            this.showResult(isCorrect, questionScore);
+        }, 1500);
     }
-
-    showResult(isCorrect, correctAnswer, pointsEarned) {
+    
+    getOptionIndex(letter) {
+        const letters = ['A', 'B', 'C', 'D'];
+        return letters.indexOf(letter) + 1;
+    }
+    
+    showResult(isCorrect, points) {
         const resultModal = new bootstrap.Modal(document.getElementById('resultModal'));
         const resultContent = document.getElementById('resultContent');
         
-        const correctAnswerText = this.getCorrectAnswerText(correctAnswer);
         const icon = isCorrect ? 'fa-check-circle text-success' : 'fa-times-circle text-danger';
         const message = isCorrect ? 'إجابة صحيحة! أحسنت!' : 'إجابة خاطئة! حاول مرة أخرى';
-        const points = isCorrect ? `+${pointsEarned}` : '0';
+        const correctAnswer = this.currentQuestionData.options[this.getOptionIndex(this.currentQuestionData.correct) - 1];
         
         resultContent.innerHTML = `
             <div class="text-center">
                 <i class="fas ${icon} fa-5x mb-3"></i>
                 <h3 class="h4 mb-3">${message}</h3>
-                <p class="text-muted mb-2">الإجابة الصحيحة: ${correctAnswerText}</p>
-                <p class="fs-5 fw-bold text-primary">النقاط المكتسبة: ${points}</p>
+                <p class="text-muted mb-2">الإجابة الصحيحة: ${correctAnswer}</p>
+                ${isCorrect ? `<p class="fs-5 fw-bold text-primary">النقاط المكتسبة: +${points}</p>` : ''}
+                <p class="text-muted small">الوقت المتبقي: ${this.timeLeft} ثانية</p>
             </div>
         `;
         
         resultModal.show();
     }
-
-    getCorrectAnswerText(correctAnswer) {
-        const optionKeys = ['option_a', 'option_b', 'option_c', 'option_d'];
-        const optionIndex = ['A', 'B', 'C', 'D'].indexOf(correctAnswer);
-        return this.currentQuestionData[optionKeys[optionIndex]];
-    }
-
+    
     nextQuestion() {
         const resultModal = bootstrap.Modal.getInstance(document.getElementById('resultModal'));
-        resultModal.hide();
+        if (resultModal) {
+            resultModal.hide();
+        }
         
         this.currentQuestion++;
         
-        if (this.currentQuestion >= this.questions.length) {
+        if (this.currentQuestion >= this.totalQuestions) {
             this.endGame();
         } else {
             this.loadQuestion();
-            this.startTimer();
         }
     }
-
+    
     timeUp() {
         clearInterval(this.timerInterval);
         
-        // Submit no answer
-        this.submitNoAnswer();
-    }
-
-    async submitNoAnswer() {
-        const timeTaken = Math.floor((Date.now() - this.questionStartTime) / 1000);
+        if (!this.gameActive) return;
         
-        try {
-            const response = await warethAPI.submitAnswer({
-                questionIndex: this.currentQuestion,
-                answer: '',
-                timeTaken: timeTaken
-            });
-            
-            // Show correct answer
-            // We don't know the correct answer from the client, so we'll just show time up
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-clock me-2"></i>انتهى الوقت!';
-            
-            // Store no answer
-            this.answers.push({
-                question_index: this.currentQuestion,
-                question: this.currentQuestionData.question_text,
-                selected: null,
-                correct: null,
-                isCorrect: false,
-                points: 0,
-                timeTaken: timeTaken
-            });
-            
-            // Show result modal
-            setTimeout(() => {
-                this.showResult(false, 'N/A', 0);
-            }, 1500);
-            
-        } catch (error) {
-            warethAPI.handleAPIError(error, 'فشل تسجيل الإجابة');
+        // Show correct answer
+        const correctIndex = this.getOptionIndex(this.currentQuestionData.correct);
+        const correctOption = document.querySelector(`.answer-option:nth-child(${correctIndex})`);
+        if (correctOption) {
+            correctOption.classList.add('correct');
         }
+        
+        // Disable all options
+        document.querySelectorAll('.answer-option').forEach(option => {
+            option.style.pointerEvents = 'none';
+        });
+        
+        // Disable hint buttons
+        this.disableHintButtons();
+        
+        // Store no answer
+        this.answers.push({
+            question: this.currentQuestionData.question,
+            selected: null,
+            correct: this.currentQuestionData.correct,
+            isCorrect: false,
+            score: 0,
+            timeLeft: 0
+        });
+        
+        // Update submit button
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-clock me-2"></i>انتهى الوقت!';
+        
+        // Show result modal
+        setTimeout(() => {
+            this.showResult(false, 0);
+        }, 1500);
     }
-
+    
     useHint(type) {
-        if (this.hints[type] <= 0) return;
+        if (!this.gameActive || this.hints[type] <= 0) return;
         
         this.hints[type]--;
         
@@ -328,48 +597,62 @@ class Game {
         document.getElementById('hint5050').textContent = this.hints['5050'];
         document.getElementById('hintSkip').textContent = this.hints['skip'];
         document.getElementById('hintAudience').textContent = this.hints['audience'];
+        
+        // Disable button if no more hints
+        if (this.hints[type] <= 0) {
+            document.getElementById(`hint${type.charAt(0).toUpperCase() + type.slice(1)}Btn`).disabled = true;
+        }
     }
-
+    
     use5050Hint() {
         const options = document.querySelectorAll('.answer-option');
-        const toHide = [];
+        const correctIndex = this.getOptionIndex(this.currentQuestionData.correct) - 1;
+        const wrongOptions = [];
         
-        // Hide 2 random options (we don't know the correct answer, so just hide random ones)
-        for (let i = 0; i < 2; i++) {
-            let randomIndex;
-            do {
-                randomIndex = Math.floor(Math.random() * 4);
-            } while (toHide.includes(randomIndex));
-            toHide.push(randomIndex);
-        }
+        options.forEach((option, index) => {
+            if (index !== correctIndex) {
+                wrongOptions.push(index);
+            }
+        });
         
-        toHide.forEach(index => {
+        // Remove 2 wrong options
+        const toRemove = wrongOptions.sort(() => Math.random() - 0.5).slice(0, 2);
+        toRemove.forEach(index => {
             options[index].style.display = 'none';
         });
     }
-
+    
     skipQuestion() {
         clearInterval(this.timerInterval);
         
-        // Submit skip
-        this.submitNoAnswer();
+        // Store skip
+        this.answers.push({
+            question: this.currentQuestionData.question,
+            selected: 'SKIPPED',
+            correct: this.currentQuestionData.correct,
+            isCorrect: false,
+            score: 0,
+            timeLeft: this.timeLeft
+        });
+        
+        this.nextQuestion();
     }
-
+    
     useAudienceHint() {
         // Simulate audience poll
-        const percentages = [
-            Math.floor(Math.random() * 30) + 20,
-            Math.floor(Math.random() * 30) + 20,
-            Math.floor(Math.random() * 30) + 20,
-            Math.floor(Math.random() * 30) + 20
-        ];
+        const correctPercentage = 40 + Math.floor(Math.random() * 30);
+        const remaining = 100 - correctPercentage;
         
-        // Adjust to sum to 100
-        const total = percentages.reduce((a, b) => a + b, 0);
-        const adjustedPercentages = percentages.map(p => Math.floor((p / total) * 100));
+        const percentages = [correctPercentage];
+        for (let i = 0; i < 3; i++) {
+            const remainingOptions = 4 - i - 1;
+            const percentage = remainingOptions > 0 ? Math.floor(Math.random() * (remaining / remainingOptions)) : remaining;
+            percentages.push(percentage);
+            remaining -= percentage;
+        }
         
         // Shuffle percentages
-        adjustedPercentages.sort(() => Math.random() - 0.5);
+        percentages.sort(() => Math.random() - 0.5);
         
         // Show percentages on options
         const options = document.querySelectorAll('.answer-option');
@@ -379,68 +662,177 @@ class Game {
                 badge.className = 'percentage-badge badge bg-primary me-2';
                 option.querySelector('.answer-text').prepend(badge);
             }
-            option.querySelector('.percentage-badge').textContent = `${adjustedPercentages[index]}%`;
+            option.querySelector('.percentage-badge').textContent = `${percentages[index]}%`;
         });
     }
-
+    
+    disableHintButtons() {
+        document.getElementById('hint5050Btn').disabled = true;
+        document.getElementById('hintSkipBtn').disabled = true;
+        document.getElementById('hintAudienceBtn').disabled = true;
+    }
+    
+    enableHintButtons() {
+        document.getElementById('hint5050Btn').disabled = this.hints['5050'] <= 0;
+        document.getElementById('hintSkipBtn').disabled = this.hints['skip'] <= 0;
+        document.getElementById('hintAudienceBtn').disabled = this.hints['audience'] <= 0;
+    }
+    
     pauseGame() {
+        if (!this.gameActive) return;
+        
         if (this.timerInterval) {
             clearInterval(this.timerInterval);
             this.timerInterval = null;
-            warethAPI.showAlert('اللعبة متوقفة مؤقتاً', 'info');
+            this.gameActive = false;
+            showAlert('اللعبة متوقفة مؤقتاً', 'info');
         } else {
+            this.gameActive = true;
             this.startTimer();
-            warethAPI.showAlert('استمرار اللعبة', 'info');
+            showAlert('استمرار اللعبة', 'info');
         }
     }
-
+    
     exitGame() {
-        if (confirm('هل أنت متأكد من إنهاء اللعبة؟')) {
+        if (confirm('هل أنت متأكد من إنهاء اللعبة؟ سيتم فقدان تقدمك الحالي.')) {
             clearInterval(this.timerInterval);
+            this.gameActive = false;
             window.location.href = 'dashboard.html';
         }
     }
-
+    
     updateUI() {
         document.getElementById('currentScore').textContent = this.score;
-        document.getElementById('progressBar').style.width = `${(this.currentQuestion / this.questions.length) * 100}%`;
+        const progress = ((this.currentQuestion) / this.totalQuestions) * 100;
+        document.getElementById('progressBar').style.width = `${progress}%`;
     }
-
-    async endGame() {
-        try {
-            // End game session
-            const response = await warethAPI.endGame();
-            
-            if (response.success) {
-                const gameData = response.data;
-                
-                // Store game results in localStorage for result page
-                localStorage.setItem('lastGame', JSON.stringify(gameData));
-                
-                // Redirect to result page
-                window.location.href = 'result.html';
-            } else {
-                throw new Error(response.message);
+    
+    endGame() {
+        clearInterval(this.timerInterval);
+        this.gameActive = false;
+        
+        // Calculate statistics
+        const correctAnswers = this.answers.filter(a => a.isCorrect).length;
+        const wrongAnswers = this.answers.filter(a => !a.isCorrect && a.selected !== null && a.selected !== 'SKIPPED').length;
+        const skippedAnswers = this.answers.filter(a => a.selected === null || a.selected === 'SKIPPED').length;
+        const percentage = Math.round((correctAnswers / this.totalQuestions) * 100);
+        
+        // Calculate time statistics
+        const totalTime = this.answers.reduce((sum, answer) => sum + (30 - answer.timeLeft), 0);
+        const avgTime = Math.round(totalTime / this.answers.length);
+        
+        // Prepare game data
+        const gameData = {
+            score: this.score,
+            totalQuestions: this.totalQuestions,
+            correctAnswers: correctAnswers,
+            wrongAnswers: wrongAnswers,
+            skippedAnswers: skippedAnswers,
+            percentage: percentage,
+            avgTime: avgTime,
+            answers: this.answers,
+            date: new Date().toLocaleString('ar-SA'),
+            hintsUsed: {
+                '5050': 3 - this.hints['5050'],
+                'skip': 1 - this.hints['skip'],
+                'audience': 2 - this.hints['audience']
             }
-        } catch (error) {
-            warethAPI.handleAPIError(error, 'فشل حفظ نتيجة اللعبة');
-            // Still redirect to dashboard even if saving failed
-            window.location.href = 'dashboard.html';
+        };
+        
+        // Store in localStorage
+        const games = JSON.parse(localStorage.getItem('games') || '[]');
+        games.push(gameData);
+        localStorage.setItem('games', JSON.stringify(games));
+        localStorage.setItem('lastGame', JSON.stringify(gameData));
+        
+        // Show game over modal
+        this.showGameOverModal(gameData);
+    }
+    
+    showGameOverModal(gameData) {
+        const gameOverModal = new bootstrap.Modal(document.getElementById('gameOverModal'));
+        const gameOverContent = document.getElementById('gameOverContent');
+        
+        let performanceText = '';
+        if (gameData.percentage >= 80) {
+            performanceText = '<p class="text-success"><i class="fas fa-crown me-2"></i>أداء ممتاز! أنت خبير في التراث</p>';
+        } else if (gameData.percentage >= 60) {
+            performanceText = '<p class="text-primary"><i class="fas fa-medal me-2"></i>أداء جيد جداً</p>';
+        } else if (gameData.percentage >= 40) {
+            performanceText = '<p class="text-warning"><i class="fas fa-award me-2"></i>أداء متوسط</p>';
+        } else {
+            performanceText = '<p class="text-info"><i class="fas fa-book me-2"></i>استمر في التعلم</p>';
         }
+        
+        gameOverContent.innerHTML = `
+            <div class="text-center">
+                <i class="fas fa-flag-checkered fa-4x text-warning mb-3"></i>
+                <h3 class="h4 mb-3">تهانينا! لقد أكملت اللعبة</h3>
+                
+                <div class="row justify-content-center mb-3">
+                    <div class="col-md-8">
+                        <div class="card border-success mb-2">
+                            <div class="card-body py-2">
+                                <h5 class="mb-0">النتيجة النهائية: <span class="text-primary">${gameData.score}</span> نقطة</h5>
+                            </div>
+                        </div>
+                        
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <div class="border rounded p-2">
+                                    <div class="text-success fw-bold">${gameData.correctAnswers}</div>
+                                    <div class="small">صحيحة</div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="border rounded p-2">
+                                    <div class="text-danger fw-bold">${gameData.wrongAnswers}</div>
+                                    <div class="small">خاطئة</div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="border rounded p-2">
+                                    <div class="text-warning fw-bold">${gameData.skippedAnswers}</div>
+                                    <div class="small">متخطاة</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <div class="progress" style="height: 20px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: ${gameData.percentage}%">
+                                    ${gameData.percentage}%
+                                </div>
+                            </div>
+                            <small class="text-muted">نسبة الإجابات الصحيحة</small>
+                        </div>
+                        
+                        ${performanceText}
+                        
+                        <p class="text-muted small mt-3">
+                            <i class="fas fa-clock me-1"></i>
+                            متوسط الوقت: ${gameData.avgTime} ثانية لكل سؤال
+                        </p>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        gameOverModal.show();
+    }
+    
+    viewResults() {
+        window.location.href = 'result.html';
     }
 }
 
 // Initialize game when page loads
 document.addEventListener('DOMContentLoaded', function() {
-    // Check if user is authenticated
-    checkAuth().then(isAuthenticated => {
-        if (!isAuthenticated) {
-            window.location.href = 'login.html';
-            return;
-        }
-        
-        // Initialize game
-        const game = new Game();
+    let game;
+    
+    // Make sure DOM is fully loaded
+    setTimeout(() => {
+        game = new Game();
         
         // Make functions globally available
         window.selectAnswer = function(element, answer) {
@@ -466,5 +858,34 @@ document.addEventListener('DOMContentLoaded', function() {
         window.exitGame = function() {
             game.exitGame();
         };
-    });
+        
+        window.viewResults = function() {
+            game.viewResults();
+        };
+    }, 100);
 });
+
+// Helper function to show alerts
+function showAlert(message, type) {
+    // Remove existing alerts
+    const existingAlerts = document.querySelectorAll('.alert.position-fixed');
+    existingAlerts.forEach(alert => alert.remove());
+    
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`;
+    alert.style.zIndex = '9999';
+    alert.style.minWidth = '300px';
+    alert.style.textAlign = 'center';
+    alert.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(alert);
+    
+    setTimeout(() => {
+        if (alert.parentNode) {
+            alert.remove();
+        }
+    }, 3000);
+}

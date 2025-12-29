@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -10,30 +11,61 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/style.css">
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-    
-    <!-- Multiplayer Game CSS -->
     <style>
-        .multiplayer-game-container {
+        :root {
+            --primary-color: #b8743b;
+            --secondary-color: #8d5f3b;
+            --dark-color: #2c1810;
+            --light-color: #f5e9de;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+        }
+        
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: linear-gradient(135deg, #f5e9de 0%, #e8d9c8 100%);
             min-height: 100vh;
+            color: var(--dark-color);
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--dark-color), #3a2418) !important;
+            border-bottom: 3px solid var(--primary-color);
+        }
+        
+        .bg-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23b8743b' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+            z-index: -1;
+        }
+        
+        .multiplayer-game-container {
+            min-height: calc(100vh - 73px);
             padding: 1rem 0;
         }
         
         .game-layout {
             display: grid;
-            grid-template-columns: 250px 1fr 300px;
-            gap: 1rem;
-            height: calc(100vh - 120px);
+            grid-template-columns: 280px 1fr 320px;
+            gap: 1.2rem;
+            height: calc(100vh - 140px);
         }
         
         @media (max-width: 1200px) {
             .game-layout {
                 grid-template-columns: 1fr;
                 grid-template-rows: auto 1fr auto;
+                height: auto;
+            }
+            
+            .players-panel,
+            .chat-panel {
+                max-height: 300px;
             }
         }
         
@@ -44,6 +76,7 @@
             padding: 1.5rem;
             box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
             border: 2px solid var(--secondary-color);
+            overflow-y: auto;
         }
         
         .player-item {
@@ -53,7 +86,7 @@
             padding: 0.75rem;
             border-radius: 0.5rem;
             margin-bottom: 0.5rem;
-            transition: background-color 0.3s ease;
+            transition: all 0.3s ease;
         }
         
         .player-item:hover {
@@ -65,53 +98,66 @@
             border: 1px solid var(--primary-color);
         }
         
+        .player-item.owner {
+            border-left: 4px solid gold;
+        }
+        
         .player-avatar {
-            width: 40px;
-            height: 40px;
+            width: 45px;
+            height: 45px;
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-weight: 600;
-            font-size: 0.875rem;
+            font-weight: 700;
+            font-size: 1rem;
             flex-shrink: 0;
         }
         
         .player-info {
             flex-grow: 1;
+            min-width: 0;
         }
         
         .player-name {
-            font-weight: 600;
+            font-weight: 700;
             color: var(--dark-color);
             margin-bottom: 0.25rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         .player-status {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: #666;
         }
         
         .player-score {
-            font-weight: 700;
+            font-weight: 800;
             color: var(--primary-color);
+            font-size: 1.1rem;
+            min-width: 50px;
+            text-align: center;
         }
         
         .player-indicator {
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
             flex-shrink: 0;
         }
         
         .indicator-ready {
             background: var(--success-color);
+            box-shadow: 0 0 8px var(--success-color);
         }
         
         .indicator-thinking {
             background: var(--warning-color);
+            box-shadow: 0 0 8px var(--warning-color);
             animation: pulse 1s infinite;
         }
         
@@ -128,82 +174,114 @@
             border: 2px solid var(--secondary-color);
             display: flex;
             flex-direction: column;
+            position: relative;
         }
         
         .game-header {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
         
         .room-info {
             background: linear-gradient(135deg, rgba(184, 116, 59, 0.1), rgba(141, 95, 59, 0.1));
-            border-radius: 0.5rem;
+            border-radius: 0.75rem;
             padding: 1rem;
             margin-bottom: 1.5rem;
+            border: 1px solid rgba(184, 116, 59, 0.2);
         }
         
         .game-timer {
-            font-size: 3rem;
+            font-size: 3.5rem;
             font-weight: 900;
             color: var(--primary-color);
             text-align: center;
-            margin-bottom: 1rem;
+            margin: 1rem 0;
+            font-family: 'Tajawal', monospace;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
         }
         
         .question-display {
-            background: var(--light-color);
+            background: linear-gradient(135deg, rgba(184, 116, 59, 0.05), rgba(141, 95, 59, 0.05));
             border-radius: 1rem;
-            padding: 2rem;
+            padding: 2.5rem;
             margin-bottom: 2rem;
-            min-height: 150px;
+            min-height: 180px;
             display: flex;
             align-items: center;
             justify-content: center;
+            border: 2px dashed var(--secondary-color);
+            transition: all 0.3s ease;
+        }
+        
+        .question-display.active {
+            background: linear-gradient(135deg, rgba(184, 116, 59, 0.1), rgba(141, 95, 59, 0.1));
+            border: 2px solid var(--primary-color);
         }
         
         .question-text {
-            font-size: 1.5rem;
-            font-weight: 600;
+            font-size: 1.6rem;
+            font-weight: 700;
             color: var(--dark-color);
             text-align: center;
             line-height: 1.8;
+            margin: 0;
         }
         
         .answers-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 1rem;
+            gap: 1.2rem;
             margin-bottom: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .answers-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .game-timer {
+                font-size: 2.5rem;
+            }
+            
+            .question-text {
+                font-size: 1.3rem;
+            }
         }
         
         .answer-option {
             background: white;
-            border: 2px solid var(--secondary-color);
-            border-radius: 0.75rem;
+            border: 3px solid var(--secondary-color);
+            border-radius: 1rem;
             padding: 1.5rem;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 120px;
         }
         
         .answer-option:hover:not(.disabled) {
             background: var(--light-color);
-            transform: translateY(-3px);
-            box-shadow: 0 0.5rem 1rem rgba(184, 116, 59, 0.2);
+            transform: translateY(-5px);
+            box-shadow: 0 0.75rem 1.5rem rgba(184, 116, 59, 0.25);
         }
         
         .answer-option.selected {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
             border-color: var(--primary-color);
+            transform: translateY(-3px);
         }
         
         .answer-option.correct {
             background: linear-gradient(135deg, #28a745, #20c997);
             color: white;
             border-color: #28a745;
-            animation: correctPulse 0.5s ease;
+            animation: correctPulse 0.6s ease;
         }
         
         .answer-option.incorrect {
@@ -215,24 +293,35 @@
         
         .answer-option.disabled {
             cursor: not-allowed;
-            opacity: 0.6;
+            opacity: 0.7;
+            transform: none !important;
         }
         
         .answer-letter {
-            display: inline-block;
-            width: 40px;
-            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
             background: var(--primary-color);
             color: white;
             border-radius: 50%;
-            line-height: 40px;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            border: 2px solid white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         
         .answer-option.selected .answer-letter {
             background: white;
             color: var(--primary-color);
+        }
+        
+        .answer-text {
+            font-weight: 600;
+            font-size: 1.1rem;
+            line-height: 1.5;
         }
         
         /* Chat Panel */
@@ -243,15 +332,14 @@
             border: 2px solid var(--secondary-color);
             display: flex;
             flex-direction: column;
-            max-height: 100%;
+            overflow: hidden;
         }
         
         .chat-header {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
-            padding: 1rem;
-            border-radius: 1rem 1rem 0 0;
-            font-weight: 600;
+            padding: 1.2rem;
+            font-weight: 700;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -259,56 +347,67 @@
         
         .chat-messages {
             flex-grow: 1;
-            padding: 1rem;
+            padding: 1.2rem;
             overflow-y: auto;
-            max-height: 400px;
+            max-height: 450px;
+            background: #f8f9fa;
         }
         
         .chat-input {
-            padding: 1rem;
+            padding: 1.2rem;
+            background: white;
             border-top: 1px solid var(--secondary-color);
         }
         
         .message {
-            margin-bottom: 0.75rem;
-            padding: 0.5rem;
-            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            animation: fadeIn 0.3s ease;
         }
         
         .message.system {
-            background: var(--light-color);
+            background: rgba(184, 116, 59, 0.1);
             text-align: center;
             font-style: italic;
-            color: #666;
-            font-size: 0.875rem;
+            color: var(--primary-color);
+            font-size: 0.9rem;
+            border: 1px solid rgba(184, 116, 59, 0.2);
         }
         
         .message.other {
-            background: var(--light-color);
-            text-align: right;
+            background: white;
+            border: 1px solid #e9ecef;
+            margin-left: 2rem;
         }
         
         .message.self {
             background: linear-gradient(135deg, rgba(184, 116, 59, 0.1), rgba(141, 95, 59, 0.1));
-            text-align: left;
+            border: 1px solid rgba(184, 116, 59, 0.3);
+            margin-right: 2rem;
         }
         
         .message-author {
-            font-weight: 600;
+            font-weight: 700;
             color: var(--primary-color);
-            font-size: 0.875rem;
-            margin-bottom: 0.25rem;
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
         
         .message-text {
             color: var(--dark-color);
-            font-size: 0.875rem;
+            font-size: 0.95rem;
+            line-height: 1.5;
         }
         
         .message-time {
             color: #666;
-            font-size: 0.75rem;
-            margin-top: 0.25rem;
+            font-size: 0.8rem;
+            margin-top: 0.3rem;
+            text-align: left;
         }
         
         /* Game Controls */
@@ -316,24 +415,30 @@
             display: flex;
             gap: 1rem;
             justify-content: center;
-            margin-top: auto;
+            margin-top: 2rem;
+            flex-wrap: wrap;
         }
         
         .ready-btn {
             background: linear-gradient(135deg, var(--success-color), #20c997);
             color: white;
             border: none;
-            padding: 1rem 2rem;
+            padding: 1rem 2.5rem;
             border-radius: 2rem;
-            font-weight: 600;
+            font-weight: 700;
             font-size: 1.1rem;
             cursor: pointer;
             transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            min-width: 200px;
         }
         
         .ready-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0.5rem 1rem rgba(40, 167, 69, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 0.75rem 1.5rem rgba(40, 167, 69, 0.3);
         }
         
         .ready-btn.ready {
@@ -344,16 +449,21 @@
             background: linear-gradient(135deg, var(--danger-color), #c82333);
             color: white;
             border: none;
-            padding: 1rem 2rem;
+            padding: 1rem 2.5rem;
             border-radius: 2rem;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            min-width: 200px;
         }
         
         .leave-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0.5rem 1rem rgba(220, 53, 69, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 0.75rem 1.5rem rgba(220, 53, 69, 0.3);
         }
         
         /* Spectator Mode */
@@ -361,25 +471,58 @@
             background: linear-gradient(135deg, var(--warning-color), #ffc107);
             color: white;
             padding: 1rem;
-            border-radius: 0.5rem;
+            border-radius: 0.75rem;
             text-align: center;
-            margin-bottom: 1rem;
-            font-weight: 600;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            animation: fadeIn 0.5s ease;
+            border: 2px solid #ffc107;
         }
         
         /* Progress Bar */
         .progress-bar-custom {
-            height: 8px;
-            background: rgba(184, 116, 59, 0.2);
-            border-radius: 4px;
+            height: 10px;
+            background: rgba(184, 116, 59, 0.15);
+            border-radius: 5px;
             overflow: hidden;
-            margin-bottom: 1rem;
+            margin: 1.5rem 0;
         }
         
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #28a745, #ffc107, #dc3545);
+            background: linear-gradient(90deg, var(--success-color), var(--warning-color), var(--danger-color));
             transition: width 1s linear;
+            border-radius: 5px;
+        }
+        
+        /* Category Badge */
+        .category-badge {
+            display: inline-block;
+            padding: 0.5rem 1.2rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 2rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin: 0.5rem 0;
+        }
+        
+        /* Question Counter */
+        .question-counter {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: var(--primary-color);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
         
         /* Animations */
@@ -399,113 +542,155 @@
             50% { opacity: 0.5; }
         }
         
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .answers-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .game-timer {
-                font-size: 2rem;
-            }
-            
-            .question-text {
-                font-size: 1.25rem;
-            }
-            
-            .game-layout {
-                grid-template-columns: 1fr;
-            }
-            
-            .players-panel,
-            .chat-panel {
-                max-height: 300px;
-            }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Room Stats */
+        .room-stats {
+            background: rgba(184, 116, 59, 0.05);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-top: 1rem;
+            border: 1px solid rgba(184, 116, 59, 0.1);
+        }
+        
+        .room-stats h6 {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+        }
+        
+        .room-stats .small {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            color: #666;
+        }
+        
+        .room-stats .small i {
+            color: var(--primary-color);
+            width: 20px;
+        }
+        
+        /* Loading Animation */
+        .loading-animation {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Toast Notifications */
+        .custom-toast {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.2);
+            border-left: 5px solid var(--primary-color);
+            z-index: 10000;
+            animation: slideIn 0.3s ease;
+            max-width: 300px;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
     </style>
-<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+    
+    <script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
 </head>
-<body class="bg-heritage">
+<body>
     <!-- Background Pattern -->
     <div class="bg-pattern"></div>
     
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
             <a class="navbar-brand" href="multiplayer.html">
-                <i class="fas fa-crown text-warning me-2"></i>
-                <span class="fw-bold">وريث</span>
+                <i class="fas fa-landmark text-warning me-2"></i>
+                <span class="fw-bold fs-4">وريث</span>
+                <span class="badge bg-warning text-dark ms-2">متعدد اللاعبين</span>
             </a>
             
             <div class="d-flex align-items-center gap-3">
-                <span class="badge bg-success">
-                    <i class="fas fa-circle me-1"></i>
-                    <span id="roomStatus">في انتظار</span>
-                </span>
-                <button class="btn btn-outline-light btn-sm" onclick="toggleFullscreen()">
-                    <i class="fas fa-expand"></i>
-                </button>
-                <button class="btn btn-danger btn-sm" onclick="leaveRoom()">
-                    <i class="fas fa-sign-out-alt me-1"></i>
-                    مغادرة
-                </button>
+                <div class="d-flex flex-column align-items-end">
+                    <span class="badge bg-success mb-1">
+                        <i class="fas fa-circle me-1"></i>
+                        <span id="roomStatus">في انتظار اللاعبين</span>
+                    </span>
+                    <small class="text-light" id="roomIdDisplay">الغرفة: #<span id="roomId">1</span></small>
+                </div>
+                
+                <div class="dropdown">
+                    <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-cog me-1"></i>الإعدادات
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><button class="dropdown-item" onclick="toggleSound()">
+                            <i class="fas fa-volume-up me-2"></i>الصوت: <span id="soundStatus">مفعل</span>
+                        </button></li>
+                        <li><button class="dropdown-item" onclick="toggleFullscreen()">
+                            <i class="fas fa-expand me-2"></i>ملء الشاشة
+                        </button></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><button class="dropdown-item text-danger" onclick="leaveRoom()">
+                            <i class="fas fa-sign-out-alt me-2"></i>مغادرة الغرفة
+                        </button></li>
+                    </ul>
+                </div>
             </div>
         </div>
     </nav>
 
     <!-- Multiplayer Game Container -->
     <div class="multiplayer-game-container">
-        <div class="container-fluid">
+        <div class="container-fluid h-100">
             <!-- Spectator Banner -->
             <div class="spectator-banner" id="spectatorBanner" style="display: none;">
                 <i class="fas fa-eye me-2"></i>
-                أنت تشاهد هذه الغرفة - لا يمكنك المشاركة في الإجابات
+                أنت تشاهد هذه الغرفة - يمكنك مشاهدة اللعب ولكن لا يمكنك المشاركة
             </div>
             
             <!-- Game Layout -->
             <div class="game-layout">
                 <!-- Players Panel -->
                 <div class="players-panel">
-                    <h5 class="mb-3">
+                    <h5 class="mb-3 text-primary">
                         <i class="fas fa-users me-2"></i>
                         اللاعبون
                     </h5>
                     <div id="playersList">
-                        <div class="player-item current-user">
-                            <div class="player-avatar">أحمد</div>
-                            <div class="player-info">
-                                <div class="player-name">أحمد (أنت)</div>
-                                <div class="player-status">جاهز</div>
-                            </div>
-                            <div class="player-score">0</div>
-                            <div class="player-indicator indicator-ready"></div>
-                        </div>
-                        <div class="player-item">
-                            <div class="player-avatar">سارة</div>
-                            <div class="player-info">
-                                <div class="player-name">سارة</div>
-                                <div class="player-status">جاهز</div>
-                            </div>
-                            <div class="player-score">0</div>
-                            <div class="player-indicator indicator-ready"></div>
-                        </div>
-                        <div class="player-item">
-                            <div class="player-avatar">خالد</div>
-                            <div class="player-info">
-                                <div class="player-name">خالد</div>
-                                <div class="player-status">جاهز</div>
-                            </div>
-                            <div class="player-score">0</div>
-                            <div class="player-indicator indicator-ready"></div>
-                        </div>
-                        <div class="player-item">
-                            <div class="player-avatar">فاطمة</div>
-                            <div class="player-info">
-                                <div class="player-name">فاطمة</div>
-                                <div class="player-status">في انتظار</div>
-                            </div>
-                            <div class="player-score">0</div>
-                            <div class="player-indicator indicator-waiting"></div>
+                        <!-- سيتم ملؤه ديناميكياً -->
+                        <div class="text-center py-4">
+                            <div class="loader"></div>
+                            <p class="mt-2 text-muted">جاري تحميل اللاعبين...</p>
                         </div>
                     </div>
                     
@@ -513,56 +698,65 @@
                     
                     <div class="room-stats">
                         <h6 class="mb-3">
-                            <i class="fas fa-chart-bar me-2"></i>
+                            <i class="fas fa-chart-line me-2"></i>
                             إحصائيات الغرفة
                         </h6>
-                        <div class="small mb-2">
-                            <i class="fas fa-users me-1"></i>
-                            <span id="playersCount">3/4</span> لاعبين جاهزين
-                        </div>
-                        <div class="small mb-2">
-                            <i class="fas fa-clock me-1"></i>
-                            وقت البدء: <span id="startTime">60</span> ثانية
-                        </div>
-                        <div class="small mb-2">
-                            <i class="fas fa-gamepad me-1"></i>
-                            المستوى: <span id="gameLevel">متوسط</span>
+                        <div class="small">
+                            <i class="fas fa-users"></i>
+                            <span>اللاعبون: <strong id="playersCount">0/4</strong></span>
                         </div>
                         <div class="small">
-                            <i class="fas fa-tag me-1"></i>
-                            الفئة: <span id="gameCategory">تاريخ</span>
+                            <i class="fas fa-tag"></i>
+                            <span>الفئة: <strong id="roomCategory">عبارات</strong></span>
+                        </div>
+                        <div class="small">
+                            <i class="fas fa-question-circle"></i>
+                            <span>الأسئلة: <strong id="totalQuestions">0</strong> سؤال</span>
+                        </div>
+                        <div class="small">
+                            <i class="fas fa-clock"></i>
+                            <span>الوقت: <strong id="questionTime">15</strong> ثانية/سؤال</span>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Game Area -->
                 <div class="game-area">
+                    <!-- Question Counter -->
+                    <div class="question-counter" id="questionCounter" style="display: none;">1</div>
+                    
                     <div class="game-header">
-                        <h3 class="mb-3">غرفة التراث الإسلامي</h3>
+                        <h3 class="mb-3 text-dark" id="roomName">غرفة التراث</h3>
+                        
+                        <div class="category-badge" id="categoryBadge">
+                            <i class="fas fa-tag me-2"></i>
+                            <span id="currentCategory">عبارات</span>
+                        </div>
+                        
                         <div class="room-info">
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <i class="fas fa-users me-2"></i>
-                                    <span id="currentPlayers">3</span>/4
+                            <div class="row text-center">
+                                <div class="col-md-3 mb-2">
+                                    <i class="fas fa-user-friends text-primary"></i>
+                                    <div class="small mt-1"><span id="currentPlayers">0</span>/4 لاعبين</div>
                                 </div>
-                                <div class="col-md-3">
-                                    <i class="fas fa-tag me-2"></i>
-                                    تاريخ
+                                <div class="col-md-3 mb-2">
+                                    <i class="fas fa-signal text-warning"></i>
+                                    <div class="small mt-1"><span id="gameDifficulty">متوسط</span></div>
                                 </div>
-                                <div class="col-md-3">
-                                    <i class="fas fa-signal me-2"></i>
-                                    متوسط
+                                <div class="col-md-3 mb-2">
+                                    <i class="fas fa-question text-success"></i>
+                                    <div class="small mt-1"><span id="gameTotalQuestions">10</span> أسئلة</div>
                                 </div>
-                                <div class="col-md-3">
-                                    <i class="fas fa-clock me-2"></i>
-                                    15 سؤال
+                                <div class="col-md-3 mb-2">
+                                    <i class="fas fa-trophy text-danger"></i>
+                                    <div class="small mt-1">الجائزة: <span id="gamePrize">100</span> نقطة</div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
                     <!-- Game Timer -->
-                    <div class="game-timer" id="gameTimer">15</div>
+                    <div class="game-timer" id="gameTimer">--</div>
                     <div class="progress-bar-custom">
                         <div class="progress-fill" id="progressBar" style="width: 100%"></div>
                     </div>
@@ -570,7 +764,11 @@
                     <!-- Question Display -->
                     <div class="question-display" id="questionDisplay">
                         <div class="question-text" id="questionText">
-                            في انتظار بدء اللعبة...
+                            <div class="loading-animation">
+                                <div class="loader"></div>
+                                <p class="mt-3">جاري تحضير الأسئلة...</p>
+                                <small class="text-muted" id="questionsLoadingInfo"></small>
+                            </div>
                         </div>
                     </div>
                     
@@ -578,19 +776,19 @@
                     <div class="answers-grid" id="answersGrid" style="display: none;">
                         <div class="answer-option" onclick="selectAnswer(this, 'A')">
                             <div class="answer-letter">أ</div>
-                            <div class="answer-text">الإجابة الأولى</div>
+                            <div class="answer-text" id="answerTextA">تحميل الإجابة...</div>
                         </div>
                         <div class="answer-option" onclick="selectAnswer(this, 'B')">
                             <div class="answer-letter">ب</div>
-                            <div class="answer-text">الإجابة الثانية</div>
+                            <div class="answer-text" id="answerTextB">تحميل الإجابة...</div>
                         </div>
                         <div class="answer-option" onclick="selectAnswer(this, 'C')">
                             <div class="answer-letter">ج</div>
-                            <div class="answer-text">الإجابة الثالثة</div>
+                            <div class="answer-text" id="answerTextC">تحميل الإجابة...</div>
                         </div>
                         <div class="answer-option" onclick="selectAnswer(this, 'D')">
                             <div class="answer-letter">د</div>
-                            <div class="answer-text">الإجابة الرابعة</div>
+                            <div class="answer-text" id="answerTextD">تحميل الإجابة...</div>
                         </div>
                     </div>
                     
@@ -598,12 +796,20 @@
                     <div class="game-controls">
                         <button class="ready-btn" id="readyBtn" onclick="toggleReady()">
                             <i class="fas fa-check me-2"></i>
-                            أنا جاهز
+                            <span id="readyText">أنا جاهز</span>
                         </button>
                         <button class="leave-btn" onclick="leaveRoom()">
                             <i class="fas fa-sign-out-alt me-2"></i>
                             مغادرة الغرفة
                         </button>
+                    </div>
+                    
+                    <!-- Quick Instructions -->
+                    <div class="mt-3 text-center">
+                        <small class="text-muted">
+                            <i class="fas fa-keyboard me-1"></i>
+                            اختصارات: <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> للإجابات | <kbd>R</kbd> للاستعداد
+                        </small>
                     </div>
                 </div>
                 
@@ -615,36 +821,33 @@
                             الدردشة
                         </span>
                         <span class="badge bg-light text-dark">
-                            <span id="chatOnlineCount">3</span>
+                            <i class="fas fa-user me-1"></i>
+                            <span id="chatOnlineCount">0</span>
                         </span>
                     </div>
                     <div class="chat-messages" id="chatMessages">
                         <div class="message system">
-                            انضم أحمد إلى الغرفة
+                            <i class="fas fa-info-circle me-1"></i>
+                            مرحباً بك في غرفة اللعب الجماعي!
                         </div>
-                        <div class="message other">
-                            <div class="message-author">سارة</div>
-                            <div class="message-text">مرحباً! هل الجميع جاهز؟</div>
-                            <div class="message-time">2:30</div>
-                        </div>
-                        <div class="message self">
-                            <div class="message-author">أحمد</div>
-                            <div class="message-text">أنا جاهز! لنبدأ</div>
-                            <div class="message-time">2:31</div>
-                        </div>
-                        <div class="message other">
-                            <div class="message-author">خالد</div>
-                            <div class="message-text">ممتاز! انتظر البقية</div>
-                            <div class="message-time">2:32</div>
+                        <div class="message system" id="welcomeMessage">
+                            جاري الاتصال بالغرفة...
                         </div>
                     </div>
                     <div class="chat-input">
                         <div class="input-group">
-                            <input type="text" class="form-control" id="chatInput" placeholder="اكتب رسالتك..." onkeypress="handleChatKeypress(event)">
-                            <button class="btn btn-primary" onclick="sendMessage()">
+                            <input type="text" class="form-control" id="chatInput" 
+                                   placeholder="اكتب رسالتك هنا..." 
+                                   onkeypress="handleChatKeypress(event)"
+                                   aria-label="رسالة الدردشة">
+                            <button class="btn btn-primary" onclick="sendMessage()" title="إرسال">
                                 <i class="fas fa-paper-plane"></i>
                             </button>
                         </div>
+                        <small class="text-muted mt-2 d-block">
+                            <i class="fas fa-info-circle me-1"></i>
+                            اضغط Enter لإرسال الرسالة
+                        </small>
                     </div>
                 </div>
             </div>
@@ -653,7 +856,64 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
     <!-- Multiplayer Game JavaScript -->
     <script src="js/multiplayer-game.js"></script>
+    
+    <!-- Additional Scripts -->
+    <script>
+        // دالة لتحديث معلومات تحميل الأسئلة
+        function updateQuestionsLoadingInfo(count) {
+            const infoElement = document.getElementById('questionsLoadingInfo');
+            if (infoElement) {
+                infoElement.textContent = `تم تحميل ${count} سؤال`;
+            }
+        }
+        
+        // دالة لعرض إشعار
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = 'custom-toast';
+            toast.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'} 
+                       text-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'primary'} me-2"></i>
+                    <div>${message}</div>
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideIn 0.3s ease reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+        
+        // دالة التحكم بالصوت
+        function toggleSound() {
+            const soundStatus = document.getElementById('soundStatus');
+            const isEnabled = soundStatus.textContent === 'مفعل';
+            soundStatus.textContent = isEnabled ? 'معطل' : 'مفعل';
+            showToast(`الصوت ${isEnabled ? 'تم إيقافه' : 'تم تفعيله'}`);
+        }
+        
+        // دالة لعرض رقم الغرفة
+        function updateRoomId() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const roomId = urlParams.get('room') || '1';
+            document.getElementById('roomId').textContent = roomId;
+        }
+        
+        // تهيئة عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            updateRoomId();
+            
+            // Simulate questions loading
+            setTimeout(() => {
+                updateQuestionsLoadingInfo('40');
+            }, 1000);
+        });
+    </script>
 </body>
 </html>

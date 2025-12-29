@@ -1,13 +1,14 @@
+
 // Multiplayer Game Room JavaScript
 
-// 賴賷賰賱 亘賷丕賳丕鬲 丕賱兀爻卅賱丞
+// هيكل بيانات الأسئلة
 class QuestionDatabase {
     constructor() {
         this.categories = {
-            '毓亘丕乇丕鬲': [],
-            '兀夭賷丕亍': [],
-            '丨乇賮': [],
-            '兀賰賱': []
+            'عبارات': [],
+            'أزياء': [],
+            'حرف': [],
+            'أكل': []
         };
         
         this.loadQuestions();
@@ -17,86 +18,86 @@ class QuestionDatabase {
         try {
             const response = await fetch('questions.json');
             if (!response.ok) {
-                throw new Error('賮卮賱 賮賷 鬲丨賲賷賱 丕賱兀爻卅賱丞');
+                throw new Error('فشل في تحميل الأسئلة');
             }
             
             const data = await response.json();
             this.categories = data.categories;
             this.shuffleAllQuestions();
             
-            console.log('鬲賲 鬲丨賲賷賱 丕賱兀爻卅賱丞 亘賳噩丕丨:', {
-                '毓亘丕乇丕鬲': this.categories['毓亘丕乇丕鬲'].length,
-                '兀夭賷丕亍': this.categories['兀夭賷丕亍'].length,
-                '丨乇賮': this.categories['丨乇賮'].length,
-                '兀賰賱': this.categories['兀賰賱'].length
+            console.log('تم تحميل الأسئلة بنجاح:', {
+                'عبارات': this.categories['عبارات'].length,
+                'أزياء': this.categories['أزياء'].length,
+                'حرف': this.categories['حرف'].length,
+                'أكل': this.categories['أكل'].length
             });
             
         } catch (error) {
-            console.error('禺胤兀 賮賷 鬲丨賲賷賱 丕賱兀爻卅賱丞:', error);
+            console.error('خطأ في تحميل الأسئلة:', error);
             this.loadDefaultQuestions();
         }
     }
     
     loadDefaultQuestions() {
-        // 兀爻卅賱丞 丕賮鬲乇丕囟賷丞 賮賷 丨丕賱丞 賮卮賱 鬲丨賲賷賱 JSON
-        this.categories['毓亘丕乇丕鬲'] = this.shuffleArray([
+        // أسئلة افتراضية في حالة فشل تحميل JSON
+        this.categories['عبارات'] = this.shuffleArray([
             {
-                text: '賲丕 賴賵 丕賱賲毓賳賶 丕賱丿賯賷賯 賱毓亘丕乇丞 "丕亘毓丿 賲賽卮賿丨丕賴"責',
+                text: 'ما هو المعنى الدقيق لعبارة "ابعد مِشْحاه"؟',
                 options: [
-                    '兀賷 兀賳賴 爻丕乇 賲爻丕賮丞 胤賵賷賱丞 賵賵氐賱 廿賱賷賴 亘胤乇賷賯丞 爻乇賷毓丞.',
-                    '兀賷 兀賳賴 丕亘鬲毓丿 賵賴丕噩乇 廿賱賶 賲賰丕賳 賱賲 賷毓丿 賷毓乇賮賴.',
-                    '兀賷 兀亘毓丿賴 賵兀賯氐丕賴 廿賱賶 賲賰丕賳 亘毓賷丿.',
-                    '兀賷 兀賳賴 爻賱賷賲 丕賱賳賷丞 賵胤賷亘 丕賱爻賲毓丞.'
+                    'أي أنه سار مسافة طويلة ووصل إليه بطريقة سريعة.',
+                    'أي أنه ابتعد وهاجر إلى مكان لم يعد يعرفه.',
+                    'أي أبعده وأقصاه إلى مكان بعيد.',
+                    'أي أنه سليم النية وطيب السمعة.'
                 ],
                 correct: 2
             },
             {
-                text: '毓亘丕乇丞 "兀亘賵 丕賱毓賲乇賷賳 賵兀亘賵 丕賱夭賲乇賷賿賳" 鬲購胤賱賯 毓賱賶:',
+                text: 'عبارة "أبو العمرين وأبو الزمريْن" تُطلق على:',
                 options: [
-                    '丕賱卮禺氐 丕賱匕賷 賷賲鬲賱賰 賲賰丕賳丞 毓丕賱賷丞 賮賷 丕賱賯賵賲.',
-                    '氐丕丨亘 丕賱兀賮毓丕賱 丕賱胤賷亘丞 賵毓馗賷賲 丕賱卮兀賳 賵胤賷亘 丕賱爻賲毓丞.',
-                    '丕賱乇噩賱 丕賱匕賷 賷賲鬲賱賰 毓賲乇丕賸 胤賵賷賱丕賸 賵夭賵噩鬲賷賳.',
-                    '丕賱賲乇兀丞 丕賱鬲賷 鬲賯賵賱 毓賳 夭賵噩賴丕 兀賳賴 "兀亘賵 丕賱毓賲乇賷賳 賵丕賱夭賲乇賷賿賳" 賱鬲賯氐賷乇賴.'
+                    'الشخص الذي يمتلك مكانة عالية في القوم.',
+                    'صاحب الأفعال الطيبة وعظيم الشأن وطيب السمعة.',
+                    'الرجل الذي يمتلك عمراً طويلاً وزوجتين.',
+                    'المرأة التي تقول عن زوجها أنه "أبو العمرين والزمريْن" لتقصيره.'
                 ],
                 correct: 1
             }
         ]);
         
-        this.categories['兀夭賷丕亍'] = this.shuffleArray([
+        this.categories['أزياء'] = this.shuffleArray([
             {
-                text: '賲丕 賴賵 丕賱夭賷 丕賱禺丕乇噩賷 丕賱兀爻丕爻賷 賱賱乇噩賱 賮賷 賲毓馗賲 亘丕丿賷丞 賳噩丿 賵丕賱匕賷 賷鬲賲賷夭 亘兀賰賲丕賲 賵丕爻毓丞 賵賲孬賱孬丞 丕賱卮賰賱責',
-                options: ['丕賱亘卮鬲', '丕賱爻丿賷乇賷', '丕賱賲乇賵丿賳', '丕賱夭亘賵賳'],
+                text: 'ما هو الزي الخارجي الأساسي للرجل في معظم بادية نجد والذي يتميز بأكمام واسعة ومثلثة الشكل؟',
+                options: ['البشت', 'السديري', 'المرودن', 'الزبون'],
                 correct: 2
             },
             {
-                text: '賲丕 賴賷 丕賱賯胤毓丞 丕賱賲乇亘毓丞 丕賱卮賰賱 丕賱鬲賷 賷囟毓賴丕 丕賱乇噩賱 毓賱賶 乇兀爻賴 賵鬲孬賳賶 毓賱賶 卮賰賱 賲孬賱孬貙 賵賯丿 賷胤賱賯 毓賱賷賴丕 丕爻賲 "賲乇賵噩賳丞"責',
-                options: ['丕賱卮賲丕睾', '丕賱睾鬲乇丞', '丕賱賲毓賲', '丕賱胤丕賯賷丞'],
+                text: 'ما هي القطعة المربعة الشكل التي يضعها الرجل على رأسه وتثنى على شكل مثلث، وقد يطلق عليها اسم "مروجنة"؟',
+                options: ['الشماغ', 'الغترة', 'المعم', 'الطاقية'],
                 correct: 1
             }
         ]);
         
-        this.categories['丨乇賮'] = this.shuffleArray([
+        this.categories['حرف'] = this.shuffleArray([
             {
-                text: '賲丕 賴賷 廿丨丿賶 丕賱賲賳鬲噩丕鬲 丕賱鬲賷 賷氐賳毓賴丕 丕賱丨丿丕丿 賵鬲購爻鬲禺丿賲 賮賷 丕賱丨乇亘責',
-                options: ['丕賱賲賰丕賷賷賱', '丕賱賲丨丕賲賷爻', '丕賱爻賷賵賮', '丕賱夭乇丕亘賷賱'],
+                text: 'ما هي إحدى المنتجات التي يصنعها الحداد وتُستخدم في الحرب؟',
+                options: ['المكاييل', 'المحاميس', 'السيوف', 'الزرابيل'],
                 correct: 2
             },
             {
-                text: '賲丕 賴賷 丕賱兀丿丕丞 丕賱丨丿賷丿賷丞 丕賱鬲賷 賷氐賳毓賴丕 丕賱丨丿丕丿 賲賳 丕賱丨丿賷丿 丕賱氐賾購賱亘 賵鬲購爻鬲禺丿賲 賱囟乇亘 丕賱氐賵丕賳 亘賯賻丿賿丨 賵賷賻賳賿亘賻毓賽孬 毓賳賴 卮乇丕乇 賷購賵噩賽賴 賱賱賮鬲賷賱丞 賱廿卮毓丕賱賴丕責',
-                options: ['丕賱卮賱賮', '丕賱賲賳賰丕亘', '丕賱賲胤乇賯丞', '丕賱夭賾賻賳購賵丿'],
+                text: 'ما هي الأداة الحديدية التي يصنعها الحداد من الحديد الصُّلب وتُستخدم لضرب الصوان بقَدْح ويَنْبَعِث عنه شرار يُوجِه للفتيلة لإشعالها؟',
+                options: ['الشلف', 'المنكاب', 'المطرقة', 'الزَّنُود'],
                 correct: 3
             }
         ]);
         
-        this.categories['兀賰賱'] = this.shuffleArray([
+        this.categories['أكل'] = this.shuffleArray([
             {
-                text: '賲丕 賴賵 丕賱賲氐胤賱丨 丕賱毓丕賲 丕賱匕賷 賷胤賱賯 毓賱賶 賲丕 賷卮亘毓 丕賱噩賵毓 兀賵 賷鬲賲 鬲賳丕賵賱賴 賰睾匕丕亍貙 賲孬賱 丕賱賯賲丨 賵丕賱禺亘夭責',
-                options: ['丕賱丿賴賳', '丕賱廿丿丕賲', '丕賱毓賷卮', '丕賱賲乇賯'],
+                text: 'ما هو المصطلح العام الذي يطلق على ما يشبع الجوع أو يتم تناوله كغذاء، مثل القمح والخبز؟',
+                options: ['الدهن', 'الإدام', 'العيش', 'المرق'],
                 correct: 2
             },
             {
-                text: '賲丕 賴賵 丕賱賲氐胤賱丨 丕賱匕賷 賷卮賷乇 廿賱賶 丕賱賱丨賲 兀賵 丕賱賮鬲丕鬲 丕賱匕賷 賷丐禺匕 賲賳 丕賱丨賷賵丕賳責',
-                options: ['丕賱爻賲賳', '丕賱卮賮乇丞', '丕賱賱丨賲', '丕賱噩賳丿賱'],
+                text: 'ما هو المصطلح الذي يشير إلى اللحم أو الفتات الذي يؤخذ من الحيوان؟',
+                options: ['السمن', 'الشفرة', 'اللحم', 'الجندل'],
                 correct: 2
             }
         ]);
@@ -126,7 +127,7 @@ class QuestionDatabase {
             return null;
         }
         
-        // 廿夭丕賱丞 丕賱爻丐丕賱 亘毓丿 丕爻鬲禺丿丕賲賴 賱賲賳毓 丕賱鬲賰乇丕乇
+        // إزالة السؤال بعد استخدامه لمنع التكرار
         return questions.shift();
     }
     
@@ -144,7 +145,7 @@ class MultiplayerGameRoom {
         this.roomId = this.getRoomIdFromUrl();
         this.isSpectator = this.getIsSpectatorFromUrl();
         this.isOwner = this.getIsOwnerFromUrl();
-        this.currentUser = localStorage.getItem('username') || '賱丕毓亘';
+        this.currentUser = localStorage.getItem('username') || 'لاعب';
         this.currentRoom = null;
         this.gameState = 'waiting';
         this.currentQuestion = null;
@@ -158,7 +159,7 @@ class MultiplayerGameRoom {
         this.questionDatabase = new QuestionDatabase();
         this.questionsHistory = [];
         this.questionsAnswered = 0;
-        this.currentCategory = '毓亘丕乇丕鬲';
+        this.currentCategory = 'عبارات';
         
         this.init();
     }
@@ -167,7 +168,7 @@ class MultiplayerGameRoom {
         this.loadRoomData();
         this.setRoomCategory();
         
-        // 丕賳鬲馗丕乇 鬲丨賲賷賱 丕賱兀爻卅賱丞
+        // انتظار تحميل الأسئلة
         await new Promise(resolve => setTimeout(resolve, 100));
         
         this.initializeWebSocket();
@@ -181,17 +182,16 @@ class MultiplayerGameRoom {
     }
     
     setRoomCategory() {
-        const categories = ['毓亘丕乇丕鬲', '兀夭賷丕亍', '丨乇賮', '兀賰賱'];
+        const categories = ['عبارات', 'أزياء', 'حرف', 'أكل'];
         const urlParams = new URLSearchParams(window.location.search);
         const categoryParam = urlParams.get('category');
-
+        
         if (categoryParam && categories.includes(categoryParam)) {
             this.currentCategory = categoryParam;
         } else {
-            // 廿匕丕 賱賲 鬲賰賳 丕賱賮卅丞 賮賷 丕賱賯丕卅賲丞貙 丕禺鬲乇 賮卅丞 毓卮賵丕卅賷丞
             this.currentCategory = categories[Math.floor(Math.random() * categories.length)];
         }
-
+        
         this.currentRoom.category = this.currentCategory;
     }
     
@@ -213,18 +213,18 @@ class MultiplayerGameRoom {
     loadRoomData() {
         this.currentRoom = {
             id: this.roomId,
-            name: `睾乇賮丞 丕賱鬲乇丕孬 - ${this.currentCategory}`,
+            name: `غرفة التراث - ${this.currentCategory}`,
             category: this.currentCategory,
-            difficulty: '賲鬲賵爻胤',
+            difficulty: 'متوسط',
             maxPlayers: 4,
             currentPlayers: 3,
             status: 'waiting',
             totalQuestions: this.getTotalQuestionsCount(),
             players: [
-                { name: this.currentUser, score: 0, status: 'ready', isOwner: this.isOwner, isCurrentUser: true },
-                { name: '爻丕乇丞', score: 0, status: 'ready', isOwner: false },
-                { name: '禺丕賱丿', score: 0, status: 'ready', isOwner: false },
-                { name: '賮丕胤賲丞', score: 0, status: 'waiting', isOwner: false }
+                { name: this.currentUser, score: 0, status: 'ready', isOwner: true, isCurrentUser: true },
+                { name: 'سارة', score: 0, status: 'ready', isOwner: false },
+                { name: 'خالد', score: 0, status: 'ready', isOwner: false },
+                { name: 'فاطمة', score: 0, status: 'waiting', isOwner: false }
             ]
         };
         
@@ -234,7 +234,7 @@ class MultiplayerGameRoom {
     
     getTotalQuestionsCount() {
         const questions = this.questionDatabase.getQuestionsByCategory(this.currentCategory);
-        return Math.min(questions.length, 10); // 丕賱丨丿 丕賱兀賯氐賶 10 兀爻卅賱丞 賱賰賱 噩賵賱丞
+        return Math.min(questions.length, 10); // الحد الأقصى 10 أسئلة لكل جولة
     }
     
     initializeWebSocket() {
@@ -253,12 +253,12 @@ class MultiplayerGameRoom {
     
     simulatePlayerActions() {
         if (Math.random() > 0.8 && this.currentRoom.currentPlayers < this.currentRoom.maxPlayers) {
-            const newPlayers = ['毓賱賷', '賳賵乇丞', '毓亘丿丕賱賱賴', '賱賲賷丕亍'];
+            const newPlayers = ['علي', 'نورة', 'عبدالله', 'لمياء'];
             const randomPlayer = newPlayers[Math.floor(Math.random() * newPlayers.length)];
             
             if (!this.players.find(p => p.name === randomPlayer)) {
                 this.addPlayer(randomPlayer);
-                this.addSystemMessage(`丕賳囟賲 ${randomPlayer} 廿賱賶 丕賱睾乇賮丞`);
+                this.addSystemMessage(`انضم ${randomPlayer} إلى الغرفة`);
             }
         }
         
@@ -267,7 +267,7 @@ class MultiplayerGameRoom {
             if (waitingPlayer) {
                 waitingPlayer.status = 'ready';
                 this.updatePlayersList();
-                this.addChatMessage(waitingPlayer.name, '兀賳丕 噩丕賴夭!', 'other');
+                this.addChatMessage(waitingPlayer.name, 'أنا جاهز!', 'other');
                 this.checkAllPlayersReady();
             }
         }
@@ -335,15 +335,15 @@ class MultiplayerGameRoom {
     updateUI() {
         document.querySelector('.game-header h3').textContent = this.currentRoom.name;
         document.getElementById('currentPlayers').textContent = this.currentRoom.currentPlayers;
-        document.getElementById('gameDifficulty').textContent = this.currentRoom.difficulty;
-        document.getElementById('currentCategory').textContent = this.currentRoom.category;
+        document.getElementById('gameLevel').textContent = this.currentRoom.difficulty;
+        document.getElementById('gameCategory').textContent = this.currentRoom.category;
         
         const statusElement = document.getElementById('roomStatus');
         const statusText = {
-            'waiting': '賮賷 丕賳鬲馗丕乇',
-            'ready': '噩丕賴夭 賱賱亘丿亍',
-            'playing': '賯賷丿 丕賱賱毓亘',
-            'finished': '丕賳鬲賴鬲'
+            'waiting': 'في انتظار',
+            'ready': 'جاهز للبدء',
+            'playing': 'قيد اللعب',
+            'finished': 'انتهت'
         };
         statusElement.textContent = statusText[this.gameState];
     }
@@ -354,18 +354,18 @@ class MultiplayerGameRoom {
         
         this.players.forEach(player => {
             const playerItem = document.createElement('div');
-            playerItem.className = `player-item ${player.isCurrentUser ? 'current-user' : ''} ${player.isOwner ? 'owner' : ''}`;
+            playerItem.className = `player-item ${player.isCurrentUser ? 'current-user' : ''}`;
             
             const statusClass = player.status === 'ready' ? 'indicator-ready' : 
                                player.status === 'thinking' ? 'indicator-thinking' : 'indicator-waiting';
             
-            const statusText = player.status === 'ready' ? '噩丕賴夭' : 
-                              player.status === 'thinking' ? '賷噩賷亘' : '賮賷 丕賳鬲馗丕乇';
+            const statusText = player.status === 'ready' ? 'جاهز' : 
+                              player.status === 'thinking' ? 'يجيب' : 'في انتظار';
             
             playerItem.innerHTML = `
                 <div class="player-avatar">${player.name.charAt(0)}</div>
                 <div class="player-info">
-                    <div class="player-name">${player.name} ${player.isCurrentUser ? '(兀賳鬲)' : ''} ${player.isOwner ? '馃憫' : ''}</div>
+                    <div class="player-name">${player.name} ${player.isCurrentUser ? '(أنت)' : ''} ${player.isOwner ? '👑' : ''}</div>
                     <div class="player-status">${statusText}</div>
                 </div>
                 <div class="player-score">${player.score}</div>
@@ -399,7 +399,7 @@ class MultiplayerGameRoom {
                 if (readyPlayers.length >= 2) {
                     this.startGame();
                 } else {
-                    this.showAlert('賱賲 賷賰賳 賴賳丕賰 賱丕毓亘賵賳 賰丕賮賺 賱亘丿亍 丕賱賱毓亘丞', 'warning');
+                    this.showAlert('لم يكن هناك لاعبون كافٍ لبدء اللعبة', 'warning');
                 }
             }
         }, 1000);
@@ -407,7 +407,7 @@ class MultiplayerGameRoom {
     
     toggleReady() {
         if (this.isSpectator) {
-            this.showAlert('賱丕 賷賲賰賳賰 鬲睾賷賷乇 丨丕賱丞 丕賱丕爻鬲毓丿丕丿 賰賲卮丕賴丿', 'info');
+            this.showAlert('لا يمكنك تغيير حالة الاستعداد كمشاهد', 'info');
             return;
         }
         
@@ -419,13 +419,13 @@ class MultiplayerGameRoom {
         
         const readyBtn = document.getElementById('readyBtn');
         if (this.isReady) {
-            readyBtn.innerHTML = '<i class="fas fa-times me-2"></i>廿賱睾丕亍 丕賱丕爻鬲毓丿丕丿';
+            readyBtn.innerHTML = '<i class="fas fa-times me-2"></i>إلغاء الاستعداد';
             readyBtn.classList.add('ready');
-            this.addChatMessage(this.currentUser, '兀賳丕 噩丕賴夭!', 'self');
+            this.addChatMessage(this.currentUser, 'أنا جاهز!', 'self');
         } else {
-            readyBtn.innerHTML = '<i class="fas fa-check me-2"></i>兀賳丕 噩丕賴夭';
+            readyBtn.innerHTML = '<i class="fas fa-check me-2"></i>أنا جاهز';
             readyBtn.classList.remove('ready');
-            this.addChatMessage(this.currentUser, '兀賱睾賷鬲 丕賱丕爻鬲毓丿丕丿', 'self');
+            this.addChatMessage(this.currentUser, 'ألغيت الاستعداد', 'self');
         }
         
         this.updatePlayersList();
@@ -459,7 +459,7 @@ class MultiplayerGameRoom {
         
         this.updatePlayersList();
         
-        this.addSystemMessage(`亘丿兀鬲 丕賱賱毓亘丞! 丕賱賮卅丞: ${this.currentCategory} 馃幃`);
+        this.addSystemMessage(`بدأت اللعبة! الفئة: ${this.currentCategory} 🎮`);
         
         setTimeout(() => {
             this.loadQuestion();
@@ -470,7 +470,7 @@ class MultiplayerGameRoom {
         const question = this.questionDatabase.getRandomQuestion(this.currentCategory);
         
         if (!question) {
-            this.showAlert('賱賲 鬲毓丿 賴賳丕賰 兀爻卅賱丞 賲鬲丕丨丞 賮賷 賴匕賴 丕賱賮卅丞!', 'info');
+            this.showAlert('لم تعد هناك أسئلة متاحة في هذه الفئة!', 'info');
             this.endGame();
             return;
         }
@@ -489,7 +489,7 @@ class MultiplayerGameRoom {
         });
         
         this.startQuestionTimer();
-        this.addSystemMessage(`丕賱爻丐丕賱 ${this.questionsAnswered}`);
+        this.addSystemMessage(`السؤال ${this.questionsAnswered}`);
     }
     
     startQuestionTimer() {
@@ -570,9 +570,9 @@ class MultiplayerGameRoom {
             if (selectedIndex === correctIndex) {
                 currentUser.score += 10;
                 this.playerScore = currentUser.score;
-                this.addChatMessage(this.currentUser, `廿噩丕亘丞 氐丨賷丨丞! +10 賳賯丕胤 (丕賱賲噩賲賵毓: ${currentUser.score}) 馃帀`, 'self');
+                this.addChatMessage(this.currentUser, `إجابة صحيحة! +10 نقاط (المجموع: ${currentUser.score}) 🎉`, 'self');
             } else {
-                this.addChatMessage(this.currentUser, '廿噩丕亘丞 禺丕胤卅丞! 丨丕賵賱 賮賷 丕賱爻丐丕賱 丕賱賯丕丿賲 馃挭', 'self');
+                this.addChatMessage(this.currentUser, 'إجابة خاطئة! حاول في السؤال القادم 💪', 'self');
             }
             currentUser.status = 'ready';
             this.updatePlayersList();
@@ -597,9 +597,9 @@ class MultiplayerGameRoom {
             const isCorrect = Math.random() > 0.3;
             if (isCorrect) {
                 randomPlayer.score += 10;
-                this.addChatMessage(randomPlayer.name, `廿噩丕亘丞 氐丨賷丨丞! +10 賳賯丕胤 (丕賱賲噩賲賵毓: ${randomPlayer.score})`, 'other');
+                this.addChatMessage(randomPlayer.name, `إجابة صحيحة! +10 نقاط (المجموع: ${randomPlayer.score})`, 'other');
             } else {
-                this.addChatMessage(randomPlayer.name, '廿噩丕亘丞 禺丕胤卅丞!', 'other');
+                this.addChatMessage(randomPlayer.name, 'إجابة خاطئة!', 'other');
             }
             randomPlayer.status = 'ready';
             this.updatePlayersList();
@@ -611,7 +611,7 @@ class MultiplayerGameRoom {
         
         const currentUser = this.players.find(p => p.isCurrentUser);
         if (currentUser && !this.selectedAnswer) {
-            this.addChatMessage(this.currentUser, '丕賳鬲賴賶 丕賱賵賯鬲! 賱賲 鬲噩亘', 'self');
+            this.addChatMessage(this.currentUser, 'انتهى الوقت! لم تجب', 'self');
             currentUser.status = 'ready';
             this.updatePlayersList();
         }
@@ -631,9 +631,9 @@ class MultiplayerGameRoom {
         this.gameState = 'finished';
         this.clearTimer();
         
-        document.getElementById('questionText').textContent = '丕賳鬲賴鬲 丕賱賱毓亘丞! 馃弳';
+        document.getElementById('questionText').textContent = 'انتهت اللعبة! 🏆';
         document.getElementById('answersGrid').style.display = 'none';
-        document.getElementById('gameTimer').textContent = '丕賳鬲賴鬲';
+        document.getElementById('gameTimer').textContent = 'انتهت';
         
         this.showGameResults();
     }
@@ -641,17 +641,17 @@ class MultiplayerGameRoom {
     showGameResults() {
         const sortedPlayers = [...this.players].sort((a, b) => b.score - a.score);
         
-        let resultsMessage = '馃弳 賳鬲丕卅噩 丕賱賱毓亘丞:\n';
+        let resultsMessage = '🏆 نتائج اللعبة:\n';
         sortedPlayers.forEach((player, index) => {
-            const medal = index === 0 ? '馃' : index === 1 ? '馃' : index === 2 ? '馃' : '';
-            resultsMessage += `${medal} ${player.name}: ${player.score} 賳賯胤丞\n`;
+            const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '';
+            resultsMessage += `${medal} ${player.name}: ${player.score} نقطة\n`;
         });
         
         this.addSystemMessage(resultsMessage);
-        this.addSystemMessage(`馃搳 丕賱賮卅丞: ${this.currentCategory} | 丕賱兀爻卅賱丞: ${this.questionsAnswered}`);
+        this.addSystemMessage(`📊 الفئة: ${this.currentCategory} | الأسئلة: ${this.questionsAnswered}`);
         
         const winner = sortedPlayers[0];
-        this.addSystemMessage(`馃帄 賮丕卅夭 丕賱賱毓亘丞: ${winner.name} 亘賭 ${winner.score} 賳賯胤丞!`);
+        this.addSystemMessage(`🎊 فائز اللعبة: ${winner.name} بـ ${winner.score} نقطة!`);
         
         setTimeout(() => {
             this.showPlayAgainOption();
@@ -661,17 +661,17 @@ class MultiplayerGameRoom {
     showPlayAgainOption() {
         document.getElementById('questionText').innerHTML = `
             <div>
-                <h4>馃幃 賴賱 鬲乇賷丿 丕賱賱毓亘 賲乇丞 兀禺乇賶責</h4>
-                <p class="text-muted">丕賱賮卅丞: ${this.currentCategory} | 丕賱兀爻卅賱丞: ${this.questionsAnswered}</p>
+                <h4>🎮 هل تريد اللعب مرة أخرى؟</h4>
+                <p class="text-muted">الفئة: ${this.currentCategory} | الأسئلة: ${this.questionsAnswered}</p>
                 <div class="mt-3">
                     <button class="btn btn-success btn-lg me-2" onclick="playAgain()">
-                        <i class="fas fa-redo me-2"></i>丕賱毓亘 賲乇丞 兀禺乇賶
+                        <i class="fas fa-redo me-2"></i>العب مرة أخرى
                     </button>
                     <button class="btn btn-primary btn-lg me-2" onclick="changeCategory()">
-                        <i class="fas fa-random me-2"></i>鬲睾賷賷乇 丕賱賮卅丞
+                        <i class="fas fa-random me-2"></i>تغيير الفئة
                     </button>
                     <button class="btn btn-secondary btn-lg" onclick="leaveRoom()">
-                        <i class="fas fa-sign-out-alt me-2"></i>賲睾丕丿乇丞
+                        <i class="fas fa-sign-out-alt me-2"></i>مغادرة
                     </button>
                 </div>
             </div>
@@ -736,8 +736,8 @@ class MultiplayerGameRoom {
         if (Math.random() > 0.5) {
             setTimeout(() => {
                 const responses = [
-                    '賲賵丕賮賯!', '兀賮賰乇...', '噩賷丿 噩丿丕賸', '賲賲鬲丕夭!',
-                    '氐毓亘 亘毓囟 丕賱卮賷亍', '兀爻賴賱 賲賲丕 鬲賵賯毓鬲'
+                    'موافق!', 'أفكر...', 'جيد جداً', 'ممتاز!',
+                    'صعب بعض الشيء', 'أسهل مما توقعت'
                 ];
                 const randomResponse = responses[Math.floor(Math.random() * responses.length)];
                 const randomPlayer = this.players.filter(p => !p.isCurrentUser)[Math.floor(Math.random() * (this.players.length - 1))];
@@ -760,7 +760,7 @@ class MultiplayerGameRoom {
     }
     
     leaveRoom() {
-        if (confirm('賴賱 兀賳鬲 賲鬲兀賰丿 賲賳 賲睾丕丿乇丞 丕賱睾乇賮丞責')) {
+        if (confirm('هل أنت متأكد من مغادرة الغرفة؟')) {
             const playerIndex = this.players.findIndex(p => p.isCurrentUser);
             if (playerIndex !== -1) {
                 this.players.splice(playerIndex, 1);
@@ -814,11 +814,11 @@ document.addEventListener('DOMContentLoaded', function() {
         window.multiplayerGameRoom.startGame();
     };
     window.changeCategory = () => {
-        const categories = ['毓亘丕乇丕鬲', '兀夭賷丕亍', '丨乇賮', '兀賰賱'];
+        const categories = ['عبارات', 'أزياء', 'حرف', 'أكل'];
         const currentIndex = categories.indexOf(window.multiplayerGameRoom.currentCategory);
         const nextIndex = (currentIndex + 1) % categories.length;
         window.multiplayerGameRoom.currentCategory = categories[nextIndex];
-        window.multiplayerGameRoom.currentRoom.name = `睾乇賮丞 丕賱鬲乇丕孬 - ${window.multiplayerGameRoom.currentCategory}`;
+        window.multiplayerGameRoom.currentRoom.name = `غرفة التراث - ${window.multiplayerGameRoom.currentCategory}`;
         window.multiplayerGameRoom.currentRoom.category = window.multiplayerGameRoom.currentCategory;
         window.multiplayerGameRoom.questionsAnswered = 0;
         window.multiplayerGameRoom.questionDatabase.shuffleAllQuestions();
@@ -829,6 +829,6 @@ document.addEventListener('DOMContentLoaded', function() {
 window.addEventListener('beforeunload', (e) => {
     if (window.multiplayerGameRoom && window.multiplayerGameRoom.gameState === 'playing') {
         e.preventDefault();
-        e.returnValue = '丕賱賱毓亘丞 賯賷丿 丕賱鬲賯丿賲. 賴賱 兀賳鬲 賲鬲兀賰丿 賲賳 丕賱賲睾丕丿乇丞責';
+        e.returnValue = 'اللعبة قيد التقدم. هل أنت متأكد من المغادرة؟';
     }
 });
